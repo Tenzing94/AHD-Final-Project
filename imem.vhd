@@ -14,6 +14,7 @@
 -- 
 -- Revision:
 -- Revision 0.01 - File Created
+-- Revision 0.02 - Tenzing - I changed line 40 from '(31 downto 2)' to '(31 downto 0)'
 -- Additional Comments:
 -- 
 ----------------------------------------------------------------------------------
@@ -36,5 +37,5 @@ architecture Behavioral of imem is
        "00000000000000000000000000000011"
       );  
     begin
-        out_imem <= rom_data(to_integer(unsigned(in_pc(31 downto 2))));
+        out_imem <= rom_data(to_integer(unsigned(in_pc(31 downto 0))));
 end Behavioral;
