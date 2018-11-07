@@ -39,21 +39,11 @@ end control_unit;
 
 architecture Behavioral of control_unit is
 
---Signal is_RType : STD_LOGIC := '0';
 Signal controlReg_temp : STD_LOGIC_VECTOR(8 downto 0);
 begin
 
 process( opCode, funct )
 Begin
-
---    -- Check if R-Type
-    
---    case opCode is
---        when "000000" =>
---            is_RType <= '1';
---        when others =>
---            is_RType <= '0';
---    end case;    
     
     -- Get function
     case opCode is

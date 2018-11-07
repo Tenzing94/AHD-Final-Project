@@ -33,6 +33,6 @@ architecture Behavioral of mux5bit2to1 is
 
 begin
 
-    X <= A when (SEL = '1') else B;
+    X <= A when (SEL = '0') else B;
 
 end Behavioral;

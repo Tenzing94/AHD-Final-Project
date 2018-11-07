@@ -60,10 +60,10 @@ begin
     process(clk)
     begin
         if (rising_edge(clk) AND WE = '1') then
-            RAM(to_integer(unsigned(A))) <= WD;
+            RAM(to_integer(unsigned(A(4 downto 0)))) <= WD;
         end if;  
     end process;
     
-    RD <= RAM(to_integer(unsigned(A)));
+    RD <= RAM(to_integer(unsigned(A(4 downto 0))));
 
 end Behavioral;
