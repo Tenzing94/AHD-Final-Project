@@ -72,13 +72,6 @@ component control_unit
        controlReg : out STD_LOGIC_VECTOR (8 downto 0));
 end component;
 
--- component FlipFlop 1-bit
-component FF1bit
-    Port (
-        clk, input : in std_logic;
-        output     : out std_logic);
-end component;
-
 -- Component Sign Extend
 component signextend
     Port (
