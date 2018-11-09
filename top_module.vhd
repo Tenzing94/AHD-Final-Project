@@ -231,6 +231,8 @@ adder2: Add_Func PORT MAP ( A_Source => signImmLeftShift , B_Source => pcPlus4 ,
 orOp <= zero OR negative;
 cPCsrc <= cBranch AND orOp;
 
+pcJump <=  in_pc(31 downto 28) & currentInst(25 downto 0) & "00";
+
 -- PC depends  jump, halt or normal
 with currentInst( 31 downto 26 ) select
     demux_pc <= pcJump when b"001100",      --Jump
