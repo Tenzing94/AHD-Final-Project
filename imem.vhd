@@ -30,13 +30,14 @@ end imem;
 
 architecture Behavioral of imem is
     -- ROM: Instruction Memory -- 
-    type ROM_type is array (0 to 3) of std_logic_vector(31 downto 0);
+    type ROM_type is array (0 to 19) of std_logic_vector(7 downto 0);
      constant rom_data: ROM_type:=(
-       "00000000000000010001000000000001",
-       "00000000010000000000100000000001",
-       "00100000100000010000000000000000",
-       "00011100100000110000000000000000"
+       "00000000","00000001","00010000","00000001",
+       "00000000","01000000","00001000","00000001",
+       "00100000","10000001","00000000","00000000",
+       "00011100","10000011","00000000","00000000",
+       "11111100","00000000","00000000","00000000"
       );  
     begin
-        out_imem <= rom_data(to_integer(unsigned(in_pc(31 downto 0))));
+        out_imem <= rom_data(to_integer(unsigned(in_pc(31 downto 0)))) & rom_data(to_integer(unsigned(in_pc(31 downto 0)) + 1 )) & rom_data(to_integer(unsigned(in_pc(31 downto 0)) + 2 )) & rom_data(to_integer(unsigned(in_pc(31 downto 0)) + 3 ));
 end Behavioral;
