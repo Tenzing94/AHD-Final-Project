@@ -85,7 +85,7 @@ Begin
         when "001011" =>        --BNE
             controlReg_temp <= "001110000";
         when "001100" =>        --JMP
-            controlReg_temp <= "001000000";                            
+            controlReg_temp <= "000000000";                            
         when others =>          --HLT
             controlReg_temp <= "000111000";
     end case;

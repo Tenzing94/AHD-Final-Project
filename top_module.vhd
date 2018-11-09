@@ -151,9 +151,11 @@ end component;
 -- Signals
 
 signal in_pc : std_logic_vector (31 downto 0) := X"00000000";
+signal demux_pc: std_logic_vector (31 downto 0);
 signal progCounter : std_logic_vector (31 downto 0);
 signal pcPlus4 : std_logic_vector (31 downto 0);
 signal pcBranch : std_logic_vector (31 downto 0);
+signal pcJump : std_logic_vector (31 downto 0);
 
 signal currentInst : std_logic_vector (31 downto 0);
 
@@ -205,7 +207,7 @@ cRegWrite <= tempCoontrolReg(0);
 
 -- Main Components
 
-pc1: pc PORT MAP(in_pc => in_pc, clr => rst, clk => clk, out_pc => progCounter );
+pc1: pc PORT MAP(in_pc => demux_pc, clr => rst, clk => clk, out_pc => progCounter );
 imem0: imem PORT MAP( in_pc => progCounter, out_imem => currentInst);
 rf0: rf PORT Map ( clk => clk, WE3 => cRegWrite, A1 => currentInst( 25 downto 21), A2 => currentInst( 20 downto 16 ), A3 => currentInst_A3 , WD3 => result , RD1 => sourceA, RD2 => register2 );
 alu0: ALU_FPGA PORT MAP( SrcA => sourceA, SrcB => sourceB, ALU_Control => cALUOpcode, ALU_Result => ALUResult, Flag_Zero => zero, Flag_Negative => negative );
@@ -221,13 +223,22 @@ mux2: mux32bit2to1 PORT MAP( SEL => cALUSrc, A => register2, B => signImm, X => 
 mux3: mux32bit2to1 PORT MAP( SEL => cMemToReg, A => ALUResult, B => memReadData, X => result);
 se0: signextend PORT MAP ( input => currentInst( 15 downto 0), output => signImm );
 ls0: Shift_Left_Func PORT MAP ( A_Source => signImm, Shift_Amt => two , Output_Val => signImmLeftShift);
-adder1: Add_Func PORT MAP ( A_Source => progCounter, B_Source => one , Output_Val => pcPlus4 );
+adder1: Add_Func PORT MAP ( A_Source => progCounter, B_Source => four , Output_Val => pcPlus4 );
 adder2: Add_Func PORT MAP ( A_Source => signImmLeftShift , B_Source => pcPlus4 , Output_Val => pcBranch );
 
 -- Branch signal
 
 orOp <= zero OR negative;
 cPCsrc <= cBranch AND orOp;
+
+pcJump <=  in_pc(31 downto 28) & currentInst(25 downto 0) & "00";
+
+-- PC depends  jump, halt or normal
+with currentInst( 31 downto 26 ) select
+    demux_pc <= pcJump when b"001100",      --Jump
+                demux_pc when b"111111",                               --Halt
+                in_pc when others;                                 -- Normal inst
+                    
 
 output <= result;
 
