@@ -28,6 +28,7 @@ entity top_module is
     Port ( 
            -- hardware-level declarations
            clk100 : in std_logic;
+           LED      : out std_logic_vector(1 downto 0);
            C 		: out  STD_LOGIC_VECTOR (7 downto 0);
            A 		: out  STD_LOGIC_VECTOR (7 downto 0);
            SW       : in std_logic_vector(2 downto 0);
@@ -107,7 +108,6 @@ end component;
          RD      : out std_logic_vector(31 downto 0));
  end component;
  
- 
  --  Component MUX32
  component mux32bit2to1
      Port (
@@ -117,12 +117,12 @@ end component;
  end component;
 
  --  Component MUX5
- component mux5bit2to1
-     Port (
-         SEL       : in std_logic;
-         A, B      : in std_logic_vector(4 downto 0);
-         X         : out std_logic_vector(4 downto 0));
- end component;
+component mux5bit2to1
+ Port (
+     SEL       : in std_logic;
+     A, B      : in std_logic_vector(4 downto 0);
+     X         : out std_logic_vector(4 downto 0));
+end component;
 
 
 -- Compunent SignExtt
@@ -261,6 +261,18 @@ with currentInst( 31 downto 26 ) select
                 in_pc when others;                                 -- Normal inst
 
 
+-- // LEDs // --
+
+
+LED(0) <= negative;
+LED(1) <= zero;
+LED(2) <= cPCsrc;
+LED(3) <= cMemToReg;
+LED(4) <= cBranch;
+LED(5) <= cALUSrc;
+LED(6) <= cRegDst;
+LED(7) <= cRegWrite;
+LED(10 downto 8) <= cALUOpcode;
 
 -- // 7-SEG // --
 --This select statement selects one of the 7-segment diplay anode(active low) at a time. 
