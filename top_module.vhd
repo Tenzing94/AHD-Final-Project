@@ -28,7 +28,7 @@ entity top_module is
     Port ( 
            -- hardware-level declarations
            clk100 : in std_logic;
-           LED      : out std_logic_vector(1 downto 0);
+           LED      : out std_logic_vector(12 downto 0);
            C 		: out  STD_LOGIC_VECTOR (7 downto 0);
            A 		: out  STD_LOGIC_VECTOR (7 downto 0);
            SW       : in std_logic_vector(2 downto 0);
@@ -262,8 +262,6 @@ with currentInst( 31 downto 26 ) select
 
 
 -- // LEDs // --
-
-
 LED(0) <= negative;
 LED(1) <= zero;
 LED(2) <= cPCsrc;

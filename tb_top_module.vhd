@@ -13,47 +13,44 @@ architecture testbench of tb_top_module is
     signal tRst : std_logic;
     signal tOut : std_logic_vector(31 downto 0);
     signal tClk : std_logic := '0'; -- init. the clock (required!)
+    signal tClk100 : std_logic;
+    signal tSwitch : std_logic;
+    signal tLED : std_logic_vector(12 downto 0);
+    signal tSw : std_logic_vector(2 downto 0);
+    
+    constant clk_period : time := 10 ns;
     
 begin
     -- // Testbench Components // --    
     -- Top Module
     UUT: entity work.top_module port map(
+            clk100 => tClk100,
+            LED => tLED,
+            SW => tSw,
             clk => tClk,
             rst => tRst,
             output => tOut);
             
+   -- Clock process definitions
+    clk_process :process
+    begin
+         tClk <= '0';
+         wait for clk_period/2;
+         tClk <= '1';
+         wait for clk_period/2;
+    end process;
+    
+       -- Stimulus process
+    stim_proc: process
+    begin        
+       -- hold reset state high for 100ns
+       tRst <= '1';
+       wait for 100 ns;    
+       wait for clk_period*10;
 
-    tb1 : process
-        constant period: time := 5 ns;
-        begin
-            --RST the top module, cycle 1
-            tClk <= '1'; wait for period;
-            tRst <= '1';           
-            tClk <= '0'; wait for period;
-            
-            --  RST low - cycle 2
-            tClk <= '1'; wait for period;
-            tRst <= '0';           
-            tClk <= '0'; wait for period;
-            
-            --  RST low - cycle 3
-            tClk <= '1'; wait for period;
-            tRst <= '0';           
-            tClk <= '0'; wait for period;
-            
-            --  RST low - cycle 4
-            tClk <= '1'; wait for period;
-            tRst <= '0';           
-            tClk <= '0'; wait for period;
-            
-            -- RST low - cycle 5
-            tClk <= '1'; wait for period;
-            tRst <= '0';           
-            tClk <= '0'; wait for period;
-            
-            -- RST low - cycle 6
-            tClk <= '1'; wait for period;
-            tRst <= '0';           
-            tClk <= '0'; wait for period;
-        end process;
+       -- start cpu (starts the PC) 
+       tRst <='0';
+ 
+       wait;
+    end process;
 end testbench;
