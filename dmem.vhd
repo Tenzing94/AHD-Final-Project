@@ -63,7 +63,6 @@ signal RAM : RAM_Type := (
 );
 
 signal sig_input : std_logic_vector(15 downto 0);
-signal sig_RD : std_logic_vector(31 downto 0);
 
 begin
     
@@ -74,9 +73,6 @@ begin
         end if;  
     end process;
     
-    sig_input <= RAM(to_integer(unsigned(A(4 downto 0))));
-    RD <= sig_RD;
-    signext : signextend PORT MAP (input => sig_input, output => sig_RD);
-    -- RD <= RAM(to_integer(unsigned(A(4 downto 0))));
+    signext : signextend PORT MAP (input => sig_input, output => RD);
 
 end Behavioral;
