@@ -230,10 +230,6 @@ cRegDst <= tempCoontrolReg(1);
 cRegWrite <= tempCoontrolReg(0);
 
 -- Main Components
-<<<<<<< HEAD
-
-=======
->>>>>>> upstream/master
 pc1: pc PORT MAP(in_pc => demux_pc, clr => rst, clk => clk, out_pc => progCounter );
 imem0: imem PORT MAP( in_pc => progCounter, out_imem => currentInst);
 rf0: rf PORT Map ( clk => clk, WE3 => cRegWrite, A1 => currentInst( 25 downto 21), A2 => currentInst( 20 downto 16 ), A3 => currentInst_A3 , WD3 => result , RD1 => sourceA, RD2 => register2 );
@@ -263,10 +259,6 @@ with currentInst( 31 downto 26 ) select
     demux_pc <= pcJump when b"001100",      --Jump
                 demux_pc when b"111111",                               --Halt
                 in_pc when others;                                 -- Normal inst
-<<<<<<< HEAD
-                    
-
-=======
 
 
 -- // LEDs // --
@@ -326,7 +318,7 @@ CONV8: Hex2LED port map (CLK => CLK100, X => HexVal(3 downto 0), Y => NAME(7));
 
 
 -- Output Assignment from TL
->>>>>>> upstream/master
+
 output <= result;
 
 
