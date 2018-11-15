@@ -110,7 +110,7 @@ Map_Ports_Add:  Add_Func Port Map ( A_Source => SrcA,
 Map_Ports_Sub:  Subtract_Func Port Map ( A_Source => SrcA,
                                          B_Source => SrcB,
                                          Output_Val => Output_Sub,
-                                         Zero_Flag => Zero_Flg_Add);                                
+                                         Zero_Flag => Zero_Flg_Sub);                                
 
 Map_Ports_And:  AND_Func Port Map ( A_Source => SrcA,
                                     B_Source => SrcB,
