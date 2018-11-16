@@ -50,3 +50,4 @@ architecture Behavioral of imem is
     begin
         out_imem <= rom_data(to_integer(unsigned(in_pc(31 downto 0)))) & rom_data(to_integer(unsigned(in_pc(31 downto 0)) + 1 )) & rom_data(to_integer(unsigned(in_pc(31 downto 0)) + 2 )) & rom_data(to_integer(unsigned(in_pc(31 downto 0)) + 3 ));
 end Behavioral;
+
