@@ -17,9 +17,6 @@ int getOpcode( char command[5], char* opcode )
 	char jmp[6] = "001100";
 	char hal[6] = "111111";
 	
-	
-	printf("Command - %s\n", command);
-	
 	if (strcmp(command,"add ") == 0)
 	{
 		strcpy(opcode, rtype);
@@ -133,38 +130,38 @@ int getFunct( char command[4], char* opcode )
 
 int getRegister(char reg[5], char* opcode)
 {
-	char r0[5] = "00000";
+	char r0[5] = "00000\0";
 	char r1[6] = "00001\0";
-	char r2[5] = "00010";
-	char r3[5] = "00011";
-	char r4[5] = "00100";
-	char r5[5] = "00101";
-	char r6[5] = "00110";
-	char r7[5] = "00111";
-	char r8[5] = "01000";
-	char r9[5] = "01001";
-	char r10[5] = "01010";
-	char r11[5] = "01011";
-	char r12[5] = "01100";
-	char r13[5] = "01101";
-	char r14[5] = "01110";
-	char r15[5] = "01111";
-	char r16[5] = "10000";
-	char r17[5] = "10001";
-	char r18[5] = "10010";
-	char r19[5] = "10011";
-	char r20[5] = "10100";
-	char r21[5] = "10101";
-	char r22[5] = "10110";
-	char r23[5] = "10111";
-	char r24[5] = "11000";
-	char r25[5] = "11001";
-	char r26[5] = "11010";
-	char r27[5] = "11011";
-	char r28[5] = "11100";
-	char r29[5] = "11101";
-	char r30[5] = "11110";
-	char r31[5] = "11111";
+	char r2[5] = "00010\0";
+	char r3[5] = "00011\0";
+	char r4[5] = "00100\0";
+	char r5[5] = "00101\0";
+	char r6[5] = "00110\0";
+	char r7[5] = "00111\0";
+	char r8[5] = "01000\0";
+	char r9[5] = "01001\0";
+	char r10[5] = "01010\0";
+	char r11[5] = "01011\0";
+	char r12[5] = "01100\0";
+	char r13[5] = "01101\0";
+	char r14[5] = "01110\0";
+	char r15[5] = "01111\0";
+	char r16[5] = "10000\0";
+	char r17[5] = "10001\0";
+	char r18[5] = "10010\0";
+	char r19[5] = "10011\0";
+	char r20[5] = "10100\0";
+	char r21[5] = "10101\0";
+	char r22[5] = "10110\0";
+	char r23[5] = "10111\0";
+	char r24[5] = "11000\0";
+	char r25[5] = "11001\0";
+	char r26[5] = "11010\0";
+	char r27[5] = "11011\0";
+	char r28[5] = "11100\0";
+	char r29[5] = "11101\0";
+	char r30[5] = "11110\0";
+	char r31[5] = "11111\0";
 	
 	
 	
@@ -322,6 +319,8 @@ int main()
 		}
 		command[4] = '\0';
 		
+		printf("Command - %s\n", command);
+		
 		char opcode[6];
 		char functOp[6];
 		char reg1Op[5];
@@ -336,7 +335,7 @@ int main()
 		//Get OpCode first 6 bits
 		getOpcode(command, opcode);
 		
-		printf("\n opcode %s\n", opcode);
+		printf("\nOpcode : %s\n", opcode);
 		
 		//R-Type
 		if(strcmp(opcode,"000000") == 0)
@@ -374,9 +373,8 @@ int main()
 				regStart2++;						
 			}
 			
-			if(buff[regStart2+2] == ',')
+			if(buff[regStart2+2] == '\n')
 			{
-				printf("%d\n",regStart2);
 				reg3[0] = buff[regStart2];
 				reg3[1] = buff[regStart2+1];
 				reg3[2] = '\0';						
@@ -678,6 +676,8 @@ int main()
 			fprintf(fp1,"\"%s\",\"%s\",\"%s\",\"%s\",\n",first8,second8,thirsd8,fourth8);	
 			
 		}
+		
+		printf("----------------------------------\n");
 			
 	}
 		
