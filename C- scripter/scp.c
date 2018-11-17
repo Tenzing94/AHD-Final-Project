@@ -376,6 +376,7 @@ int main()
 			
 			if(buff[regStart2+2] == ',')
 			{
+				printf("%d\n",regStart2);
 				reg3[0] = buff[regStart2];
 				reg3[1] = buff[regStart2+1];
 				reg3[2] = '\0';						
