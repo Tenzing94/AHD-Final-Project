@@ -128,40 +128,40 @@ int getFunct( char command[4], char* opcode )
 	return 0;
 }
 
-int getRegister(char reg[5], char* opcode)
+int getRegister(char reg[6], char* opcode)
 {
-	char r0[5] = "00000\0";
+	char r0[6] = "00000\0";
 	char r1[6] = "00001\0";
-	char r2[5] = "00010\0";
-	char r3[5] = "00011\0";
-	char r4[5] = "00100\0";
-	char r5[5] = "00101\0";
-	char r6[5] = "00110\0";
-	char r7[5] = "00111\0";
-	char r8[5] = "01000\0";
-	char r9[5] = "01001\0";
-	char r10[5] = "01010\0";
-	char r11[5] = "01011\0";
-	char r12[5] = "01100\0";
-	char r13[5] = "01101\0";
-	char r14[5] = "01110\0";
-	char r15[5] = "01111\0";
-	char r16[5] = "10000\0";
-	char r17[5] = "10001\0";
-	char r18[5] = "10010\0";
-	char r19[5] = "10011\0";
-	char r20[5] = "10100\0";
-	char r21[5] = "10101\0";
-	char r22[5] = "10110\0";
-	char r23[5] = "10111\0";
-	char r24[5] = "11000\0";
-	char r25[5] = "11001\0";
-	char r26[5] = "11010\0";
-	char r27[5] = "11011\0";
-	char r28[5] = "11100\0";
-	char r29[5] = "11101\0";
-	char r30[5] = "11110\0";
-	char r31[5] = "11111\0";
+	char r2[6] = "00010\0";
+	char r3[6] = "00011\0";
+	char r4[6] = "00100\0";
+	char r5[6] = "00101\0";
+	char r6[6] = "00110\0";
+	char r7[6] = "00111\0";
+	char r8[6] = "01000\0";
+	char r9[6] = "01001\0";
+	char r10[6] = "01010\0";
+	char r11[6] = "01011\0";
+	char r12[6] = "01100\0";
+	char r13[6] = "01101\0";
+	char r14[6] = "01110\0";
+	char r15[6] = "01111\0";
+	char r16[6] = "10000\0";
+	char r17[6] = "10001\0";
+	char r18[6] = "10010\0";
+	char r19[6] = "10011\0";
+	char r20[6] = "10100\0";
+	char r21[6] = "10101\0";
+	char r22[6] = "10110\0";
+	char r23[6] = "10111\0";
+	char r24[6] = "11000\0";
+	char r25[6] = "11001\0";
+	char r26[6] = "11010\0";
+	char r27[6] = "11011\0";
+	char r28[6] = "11100\0";
+	char r29[6] = "11101\0";
+	char r30[6] = "11110\0";
+	char r31[6] = "11111\0";
 	
 	
 	
@@ -306,7 +306,7 @@ int main()
 	FILE* fp, *fp1;
 	int i;
 	char buff[255];
-	char command[5], reg1[5], reg2[5], reg3[5],immediate[17];
+	char command[5], reg1[6], reg2[6], reg3[6],immediate[17];
 	fp = fopen("assemb.txt", "r");
 	fp1 = fopen("opcode.txt", "w");
 	

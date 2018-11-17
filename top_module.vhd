@@ -229,8 +229,12 @@ adder1: Add_Func PORT MAP ( A_Source => progCounter, B_Source => four , Output_V
 adder2: Add_Func PORT MAP ( A_Source => signImmLeftShift , B_Source => pcPlus4 , Output_Val => pcBranch );
 
 -- Branch signal
+--Branch using MUX
+with currentInst( 31 downto 26 ) select
+    orOp <=   negative when "001001",            --BLT    
+              not zero when "001011",            --BNE
+              zero when others;                  --BEQ
 
-orOp <= zero OR negative;
 cPCsrc <= cBranch AND orOp;
 
 pcJump <=  in_pc(31 downto 28) & currentInst(25 downto 0) & "00";
