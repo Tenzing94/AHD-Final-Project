@@ -131,7 +131,7 @@ int getFunct( char command[4], char* opcode )
 	return 0;
 }
 
-int getRegister(char reg[3], char* opcode)
+int getRegister(char reg[5], char* opcode)
 {
 	char r0[5] = "00000";
 	char r1[6] = "00001\0";
@@ -309,7 +309,7 @@ int main()
 	FILE* fp, *fp1;
 	int i;
 	char buff[255];
-	char command[5], reg1[3], reg2[3], reg3[3],immediate[17];
+	char command[5], reg1[5], reg2[5], reg3[5],immediate[17];
 	fp = fopen("assemb.txt", "r");
 	fp1 = fopen("opcode.txt", "w");
 	
@@ -331,6 +331,7 @@ int main()
 		char shamt2[2]="00";
 		
 		char first8[9],second8[9],thirsd8[9],fourth8[9];
+		int regStart = 4,regStart1 = 7,regStart2 = 10;
 		
 		//Get OpCode first 6 bits
 		getOpcode(command, opcode);
@@ -340,18 +341,53 @@ int main()
 		//R-Type
 		if(strcmp(opcode,"000000") == 0)
 		{	
-			reg1[0] = buff[4];
-			reg1[1] = buff[5];
-			reg1[2] = '\0';
+			if(buff[regStart+2] == ',')
+			{
+				reg1[0] = buff[regStart];
+				reg1[1] = buff[regStart+1];
+				reg1[2] = '\0';								
+			}
+			else
+			{
+				reg1[0] = buff[regStart];
+				reg1[1] = buff[regStart+1];
+				reg1[2] = buff[regStart+2];
+				reg1[3] = '\0';
+				
+				regStart1++;
+				regStart2++;										
+			}
 			
-			reg2[0] = buff[7];
-			reg2[1] = buff[8];
-			reg2[2] = '\0';
+			if(buff[regStart1+2] == ',')
+			{
+				reg2[0] = buff[regStart1];
+				reg2[1] = buff[regStart1+1];
+				reg2[2] = '\0';							
+			}
+			else
+			{
+				reg2[0] = buff[regStart1];
+				reg2[1] = buff[regStart1+1];
+				reg2[2] = buff[regStart1+2];
+				reg2[3] = '\0';
+					
+				regStart2++;						
+			}
 			
-			reg3[0] = buff[10];
-			reg3[1] = buff[11];
-			reg3[2] = '\0';
-			
+			if(buff[regStart2+2] == ',')
+			{
+				reg3[0] = buff[regStart2];
+				reg3[1] = buff[regStart2+1];
+				reg3[2] = '\0';						
+			}
+			else
+			{
+				reg3[0] = buff[regStart2];
+				reg3[1] = buff[regStart2+1];
+				reg3[2] = buff[regStart2+2];
+				reg3[3] = '\0';							
+			}
+	
 			getFunct(command, functOp);
 			printf("funct - %s\n", functOp);
 			
@@ -414,33 +450,91 @@ int main()
 		{
 			if( (strcmp(opcode,"000001") == 0) || (strcmp(opcode,"000010") == 0) || (strcmp(opcode,"000011") == 0) )
 			{
-				reg1[0] = buff[5];
-				reg1[1] = buff[6];
-				reg1[2] = '\0';
+				regStart = 5;
+				regStart1 = 8;
+				regStart2 = 11;
 				
-				reg2[0] = buff[8];
-				reg2[1] = buff[9];
-				reg2[2] = '\0';
-				
-				for(i=11;i<27;i++)
+				if(buff[regStart+2] == ',')
 				{
-					immediate[i-11] = buff[i];		
+					reg1[0] = buff[regStart];
+					reg1[1] = buff[regStart+1];
+					reg1[2] = '\0';								
+				}
+				else
+				{
+					reg1[0] = buff[regStart];
+					reg1[1] = buff[regStart+1];
+					reg1[2] = buff[regStart+2];
+					reg1[3] = '\0';
+					
+					regStart1++;
+					regStart2++;										
+				}
+				
+				if(buff[regStart1+2] == ',')
+				{
+					reg2[0] = buff[regStart1];
+					reg2[1] = buff[regStart1+1];
+					reg2[2] = '\0';							
+				}
+				else
+				{
+					reg2[0] = buff[regStart1];
+					reg2[1] = buff[regStart1+1];
+					reg2[2] = buff[regStart1+2];
+					reg2[3] = '\0';
+						
+					regStart2++;						
+				}
+				
+				for(i=regStart2;i<regStart2+16;i++)
+				{
+					immediate[i-regStart2] = buff[i];		
 				}
 				immediate[16] = '\0';
 			}
 			else
 			{
-				reg1[0] = buff[4];
-				reg1[1] = buff[5];
-				reg1[2] = '\0';
+				regStart = 4;
+				regStart1 = 7;
+				regStart2 = 10;
 				
-				reg2[0] = buff[7];
-				reg2[1] = buff[8];
-				reg2[2] = '\0';
-				
-				for(i=10;i<26;i++)
+				if(buff[regStart+2] == ',')
 				{
-					immediate[i-10] = buff[i];		
+					reg1[0] = buff[regStart];
+					reg1[1] = buff[regStart+1];
+					reg1[2] = '\0';								
+				}
+				else
+				{
+					reg1[0] = buff[regStart];
+					reg1[1] = buff[regStart+1];
+					reg1[2] = buff[regStart+2];
+					reg1[3] = '\0';
+					
+					regStart1++;
+					regStart2++;										
+				}
+				
+				if(buff[regStart1+2] == ',')
+				{
+					reg2[0] = buff[regStart1];
+					reg2[1] = buff[regStart1+1];
+					reg2[2] = '\0';							
+				}
+				else
+				{
+					reg2[0] = buff[regStart1];
+					reg2[1] = buff[regStart1+1];
+					reg2[2] = buff[regStart1+2];
+					reg2[3] = '\0';
+						
+					regStart2++;						
+				}
+				
+				for(i=regStart2;i<regStart2+16;i++)
+				{
+					immediate[i-regStart2] = buff[i];		
 				}
 				immediate[16] = '\0';
 			}
