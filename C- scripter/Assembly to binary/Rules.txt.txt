@@ -1,3 +1,0 @@
-
-1. Use sw1,lw1,or1
-2. USe hal ( space after hal)

@@ -17,23 +17,23 @@ int getOpcode( char command[5], char* opcode )
 	char jmp[6] = "001100";
 	char hal[6] = "111111";
 	
-	if (strcmp(command,"add ") == 0)
+	if (strcmp(command,"add") == 0)
 	{
 		strcpy(opcode, rtype);
 	}
-	else if (strcmp(command,"sub ") == 0)
+	else if (strcmp(command,"sub") == 0)
 	{
 		strcpy(opcode, rtype);
 	}
-	else if (strcmp(command,"and ") == 0)
+	else if (strcmp(command,"and") == 0)
 	{
 		strcpy(opcode, rtype);
 	}
-	else if (strcmp(command,"or1 ") == 0)
+	else if (strcmp(command,"or") == 0)
 	{
 		strcpy(opcode, rtype);
 	}
-	else if (strcmp(command,"nor ") == 0)
+	else if (strcmp(command,"nor") == 0)
 	{
 		strcpy(opcode, rtype);
 	}
@@ -49,44 +49,43 @@ int getOpcode( char command[5], char* opcode )
 	{
 		strcpy(opcode, andi);
 	}
-	else if (strcmp(command,"ori ") == 0)
+	else if (strcmp(command,"ori") == 0)
 	{
 		strcpy(opcode, ori);
 	}
-	else if (strcmp(command,"shl ") == 0)
+	else if (strcmp(command,"shl") == 0)
 	{
 		strcpy(opcode, shl);
 	}
-	else if (strcmp(command,"lw1 ") == 0)
+	else if (strcmp(command,"lw") == 0)
 	{
 		strcpy(opcode, lw);
 	}
-	else if (strcmp(command,"sw1 ") == 0)
+	else if (strcmp(command,"sw") == 0)
 	{
 		strcpy(opcode, sw);
 	}
-	else if (strcmp(command,"blt ") == 0)
+	else if (strcmp(command,"blt") == 0)
 	{
 		strcpy(opcode, blt);
 	}
-	else if (strcmp(command,"beq ") == 0)
+	else if (strcmp(command,"beq") == 0)
 	{
 		strcpy(opcode, beq);
 	}
-	else if (strcmp(command,"bne ") == 0)
+	else if (strcmp(command,"bne") == 0)
 	{
 		strcpy(opcode, bne);
 	}
-	else if (strcmp(command,"jmp ") == 0)
+	else if (strcmp(command,"jmp") == 0)
 	{
 		strcpy(opcode, jmp);
 	}
-	else if (strcmp(command,"hal ") == 0)
+	else if (strcmp(command,"hal") == 0)
 	{
 		strcpy(opcode, hal);
 	}
-	
-	
+
 	return 0;
 }
 
@@ -98,27 +97,27 @@ int getFunct( char command[4], char* opcode )
 	char or1[6] = "000111";
 	char nor[6] = "001001";
 	
-	if (strcmp(command,"add ") == 0)
+	if (strcmp(command,"add") == 0)
 	{
 		strcpy(opcode, add);
 		
 	}
-	else if (strcmp(command,"sub ") == 0)
+	else if (strcmp(command,"sub") == 0)
 	{
 		strcpy(opcode, sub);
 		
 	}
-	else if (strcmp(command,"and ") == 0)
+	else if (strcmp(command,"and") == 0)
 	{
 		strcpy(opcode, and1);
 		
 	}
-	else if (strcmp(command,"or1 ") == 0)
+	else if (strcmp(command,"or") == 0)
 	{
 		strcpy(opcode, or1);
 		
 	}
-	else if (strcmp(command,"nor ") == 0)
+	else if (strcmp(command,"nor") == 0)
 	{
 		strcpy(opcode, nor);
 		
@@ -162,8 +161,6 @@ int getRegister(char reg[6], char* opcode)
 	char r29[6] = "11101\0";
 	char r30[6] = "11110\0";
 	char r31[6] = "11111\0";
-	
-	
 	
 	if (strcmp(reg,"r0") == 0)
 	{
@@ -306,18 +303,27 @@ int main()
 	FILE* fp, *fp1;
 	int i;
 	char buff[255];
-	char command[5], reg1[6], reg2[6], reg3[6],immediate[17];
 	fp = fopen("assemb.txt", "r");
 	fp1 = fopen("opcode.txt", "w");
 	
 	
 	while ( ( fgets(buff, 255, (FILE*)fp)) != '\0' )
 	{
-		for(i=0;i<4;i++)
+		
+		char command[5], reg1[6], reg2[6], reg3[6],immediate[17];
+		
+		i = 0;
+		int regStart = 0;
+		
+		while(buff[i] != ' ')
 		{
-			command[i] = buff[i];		
+			command[i] = buff[i];
+			i++;
 		}
-		command[4] = '\0';
+		
+		command[i] = '\0';
+		regStart = i+1;
+		i=0;
 		
 		printf("Command - %s\n", command);
 		
@@ -330,7 +336,7 @@ int main()
 		char shamt2[2]="00";
 		
 		char first8[9],second8[9],thirsd8[9],fourth8[9];
-		int regStart = 4,regStart1 = 7,regStart2 = 10;
+//		int regStart = 4,regStart1 = 7,regStart2 = 10;
 		
 		//Get OpCode first 6 bits
 		getOpcode(command, opcode);
@@ -340,52 +346,35 @@ int main()
 		//R-Type
 		if(strcmp(opcode,"000000") == 0)
 		{	
-			if(buff[regStart+2] == ',')
+			while(buff[regStart] != ',')
 			{
-				reg1[0] = buff[regStart];
-				reg1[1] = buff[regStart+1];
-				reg1[2] = '\0';								
+				reg1[i] = buff[regStart];
+				regStart++;
+				i++;
 			}
-			else
+			reg1[i] = '\0';
+			regStart += 1;
+			i=0;
+	
+			while(buff[regStart] != ',')
 			{
-				reg1[0] = buff[regStart];
-				reg1[1] = buff[regStart+1];
-				reg1[2] = buff[regStart+2];
-				reg1[3] = '\0';
-				
-				regStart1++;
-				regStart2++;										
+				reg2[i] = buff[regStart];
+				regStart++;
+				i++;
 			}
+			reg2[i] = '\0';
+			regStart += 1;
+			i=0;
 			
-			if(buff[regStart1+2] == ',')
+			while(buff[regStart] != '\n')
 			{
-				reg2[0] = buff[regStart1];
-				reg2[1] = buff[regStart1+1];
-				reg2[2] = '\0';							
+				reg3[i] = buff[regStart];
+				regStart++;
+				i++;
 			}
-			else
-			{
-				reg2[0] = buff[regStart1];
-				reg2[1] = buff[regStart1+1];
-				reg2[2] = buff[regStart1+2];
-				reg2[3] = '\0';
-					
-				regStart2++;						
-			}
-			
-			if(buff[regStart2+2] == '\n')
-			{
-				reg3[0] = buff[regStart2];
-				reg3[1] = buff[regStart2+1];
-				reg3[2] = '\0';						
-			}
-			else
-			{
-				reg3[0] = buff[regStart2];
-				reg3[1] = buff[regStart2+1];
-				reg3[2] = buff[regStart2+2];
-				reg3[3] = '\0';							
-			}
+			reg3[i] = '\0';
+			regStart += 1;
+			i=0;
 	
 			getFunct(command, functOp);
 			printf("funct - %s\n", functOp);
@@ -447,97 +436,34 @@ int main()
 		}
 		else if( !(strcmp(opcode,"001100") == 0) && !(strcmp(opcode,"111111") == 0))		//J-Type
 		{
-			if( (strcmp(opcode,"000001") == 0) || (strcmp(opcode,"000010") == 0) || (strcmp(opcode,"000011") == 0) )
+			while(buff[regStart] != ',')
 			{
-				regStart = 5;
-				regStart1 = 8;
-				regStart2 = 11;
-				
-				if(buff[regStart+2] == ',')
-				{
-					reg1[0] = buff[regStart];
-					reg1[1] = buff[regStart+1];
-					reg1[2] = '\0';								
-				}
-				else
-				{
-					reg1[0] = buff[regStart];
-					reg1[1] = buff[regStart+1];
-					reg1[2] = buff[regStart+2];
-					reg1[3] = '\0';
-					
-					regStart1++;
-					regStart2++;										
-				}
-				
-				if(buff[regStart1+2] == ',')
-				{
-					reg2[0] = buff[regStart1];
-					reg2[1] = buff[regStart1+1];
-					reg2[2] = '\0';							
-				}
-				else
-				{
-					reg2[0] = buff[regStart1];
-					reg2[1] = buff[regStart1+1];
-					reg2[2] = buff[regStart1+2];
-					reg2[3] = '\0';
-						
-					regStart2++;						
-				}
-				
-				for(i=regStart2;i<regStart2+16;i++)
-				{
-					immediate[i-regStart2] = buff[i];		
-				}
-				immediate[16] = '\0';
+				reg1[i] = buff[regStart];
+				regStart++;
+				i++;
 			}
-			else
+			reg1[i] = '\0';
+			regStart += 1;
+			i=0;
+	
+			while(buff[regStart] != ',')
 			{
-				regStart = 4;
-				regStart1 = 7;
-				regStart2 = 10;
-				
-				if(buff[regStart+2] == ',')
-				{
-					reg1[0] = buff[regStart];
-					reg1[1] = buff[regStart+1];
-					reg1[2] = '\0';								
-				}
-				else
-				{
-					reg1[0] = buff[regStart];
-					reg1[1] = buff[regStart+1];
-					reg1[2] = buff[regStart+2];
-					reg1[3] = '\0';
-					
-					regStart1++;
-					regStart2++;										
-				}
-				
-				if(buff[regStart1+2] == ',')
-				{
-					reg2[0] = buff[regStart1];
-					reg2[1] = buff[regStart1+1];
-					reg2[2] = '\0';							
-				}
-				else
-				{
-					reg2[0] = buff[regStart1];
-					reg2[1] = buff[regStart1+1];
-					reg2[2] = buff[regStart1+2];
-					reg2[3] = '\0';
-						
-					regStart2++;						
-				}
-				
-				for(i=regStart2;i<regStart2+16;i++)
-				{
-					immediate[i-regStart2] = buff[i];		
-				}
-				immediate[16] = '\0';
+				reg2[i] = buff[regStart];
+				regStart++;
+				i++;
+			}
+			reg1[i] = '\0';
+			regStart += 1;
+			i=0;
+			
+			while(buff[regStart] != '\n')
+			{
+				immediate[i] = buff[regStart];	
+				regStart++;
+				i++;
 			}
 			
+			immediate[16] = '\0';
 			
 			
 			getRegister(reg1, reg1Op);
