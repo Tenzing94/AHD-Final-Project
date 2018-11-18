@@ -245,8 +245,9 @@ with currentInst( 31 downto 26 ) select
                 demux_pc when b"111111",                               --Halt
                 in_pc when others;                                 -- Normal inst
                     
-
-output <= result;
+with currentInst( 31 downto 26 ) select
+    output <=  X"00000000" when "111111",
+               result when others;
 
 bit_flags <= tempCoontrolReg; -- This will be the sent to the LED as output
 
