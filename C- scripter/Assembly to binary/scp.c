@@ -452,7 +452,7 @@ int main()
 				regStart++;
 				i++;
 			}
-			reg1[i] = '\0';
+			reg2[i] = '\0';
 			regStart += 1;
 			i=0;
 			
