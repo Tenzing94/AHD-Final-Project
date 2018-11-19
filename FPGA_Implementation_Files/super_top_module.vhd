@@ -38,7 +38,7 @@ entity super_top_module is
            SW        : in STD_LOGIC_VECTOR(0 downto 0); -- SW[0], toggles between slow clock and clock button
            CA        : out  std_logic_vector (6 downto 0); -- Cathodes
            AN        : out  std_logic_vector (7 downto 0); -- Anodes
-           LED       : out STD_LOGIC_VECTOR (8 downto 0) -- LED output
+           LED       : out STD_LOGIC_VECTOR (15 downto 0) -- LED output
       );
 end super_top_module;
 
@@ -64,7 +64,8 @@ component top_module is
     Port ( clk       : in STD_LOGIC;
            rst       : in STD_LOGIC;
            output    : out STD_LOGIC_VECTOR (31 downto 0);
-           bit_flags : out STD_LOGIC_VECTOR (8 downto 0) -- LED output
+           bit_flags : out STD_LOGIC_VECTOR (8 downto 0); -- LED output
+           hal       : out STD_LOGIC
           );
 end component;
 
@@ -95,14 +96,14 @@ signal sig_output : std_logic_vector(31 downto 0);
 signal sig_bit_flags : std_logic_vector(8 downto 0);
 signal sig_cathode : std_logic_vector(6 downto 0);
 signal sig_anode : std_logic_vector(7 downto 0);
-
+signal hal : std_logic;
 
 begin
 
 ------------------------------ PORT MAPS ------------------------------
 DBBTNC  : debouncer PORT MAP (clk => sig_clk_100Mhz, button_in => sig_BTNC, pulse_out => sig_clock_button);
 CLKSLOW : clk_slow PORT MAP (clk_in => sig_clk_100Mhz, clk_out => sig_clk_slow);
-TOP     : top_module PORT MAP (clk => sig_clock_in, rst => sig_reset_button, output => sig_output, bit_flags => sig_bit_flags);
+TOP     : top_module PORT MAP (clk => sig_clock_in, rst => sig_reset_button, output => sig_output, bit_flags => sig_bit_flags, hal =>  hal);
 CLKSSD  : clk_for_ssd PORT MAP (clk_in => sig_clk_100Mhz, clk_out => sig_clk_for_ssd);
 SSD     : seven_seg PORT MAP (clk_for_ssd => sig_clk_for_ssd, ss_input => sig_output, Cathode_Pattern => sig_cathode, AN_Activate => sig_anode);
 
@@ -121,7 +122,10 @@ sig_reset_button <= BTNU; -- no need for a debouncer for the reset button
 sig_SW_clk <= SW(0);
 CA <= sig_cathode;
 AN <= sig_anode;
-LED <= sig_bit_flags;
+LED(8 downto 0) <= sig_bit_flags;
 
+with hal select
+    LED(15 downto 9) <= "1111111" when '1',
+                        "0000000" when others;
 
 end Behavioral;

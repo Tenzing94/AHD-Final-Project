@@ -36,7 +36,8 @@ entity top_module is
     Port ( clk : in STD_LOGIC;
            rst : in STD_LOGIC;
            output : out STD_LOGIC_VECTOR (31 downto 0);
-           bit_flags : out STD_LOGIC_VECTOR (8 downto 0) -- LED output
+           bit_flags : out STD_LOGIC_VECTOR (8 downto 0); -- LED output
+           hal : out STD_LOGIC
           );
 end top_module;
 
@@ -248,6 +249,10 @@ with currentInst( 31 downto 26 ) select
 with currentInst( 31 downto 26 ) select
     output <=  X"00000000" when "111111",
                result when others;
+
+with currentInst( 31 downto 26 ) select
+    hal <=  '1' when "111111",
+            '0' when others;
 
 bit_flags <= tempCoontrolReg; -- This will be the sent to the LED as output
 
