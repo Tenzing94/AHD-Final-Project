@@ -39,7 +39,7 @@ int decToBinary(unsigned int n, char inp )
 
 int main()
 {
-	unsigned int pc,address,imm;
+	unsigned int pc,address,imm,currentLine, targetLine;
 	
 	char inp;
 
@@ -50,21 +50,24 @@ int main()
 		
 		if(inp == 'b')
 		{
-			printf("\nInput current pc : ");
-			scanf("%d",&pc);
-			printf("\nInput target pc : ");
-			scanf("%d",&address);
+			printf("\nInput current line : ");
+			scanf("%d",&currentLine);
+			pc = (currentLine - 1) * 4;
+			printf("\nInput target line : ");
+			scanf("%d",&targetLine);
+			address = (targetLine - 1)*4;
 							
 			imm = address - pc - 4;
-			printf("\n%d\n",imm);
-//			printf("Displays only 28 bits append 4 MSB by sign extend");
+			printf("Current pc = %d\t Target pc = %d",pc,address);
 		}
 		else if(inp == 'j')
 		{
-			printf("\nInput target pc : ");
-			scanf("%d",&imm);
+			printf("\nInput target line : ");
+			scanf("%d",&targetLine);
+			imm = (targetLine - 1)*4;
 		}
 		
+		printf("\n%d\n",imm);
 		printf("VALUE TO USE : ");
 		decToBinary(imm,inp);
 		

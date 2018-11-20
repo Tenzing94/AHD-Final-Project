@@ -242,7 +242,7 @@ pcJump <=  in_pc(31 downto 28) & currentInst(25 downto 0) & "00";
 -- PC depends  jump, halt or normal
 with currentInst( 31 downto 26 ) select
     demux_pc <= pcJump when b"001100",      --Jump
-                demux_pc when b"111111",                               --Halt
+                progCounter when b"111111",                               --Halt
                 in_pc when others;                                 -- Normal inst
                     
 with currentInst( 31 downto 26 ) select
