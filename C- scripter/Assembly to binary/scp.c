@@ -315,7 +315,7 @@ int main()
 		i = 0;
 		int regStart = 0;
 		
-		while(buff[i] != ' ')
+		while(buff[i] != ' ' && buff[i] != '\n')
 		{
 			command[i] = buff[i];
 			i++;
