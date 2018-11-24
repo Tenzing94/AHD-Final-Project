@@ -1,0 +1,6 @@
+lw r0,r6,0000000000000000	--start skey
+shl r6,r6,0000000000010000
+lw r0,r4,0000000000000001
+and r4,r3,r4
+or r6,r4,r6
+sub r4,r4,r4			--end skey
