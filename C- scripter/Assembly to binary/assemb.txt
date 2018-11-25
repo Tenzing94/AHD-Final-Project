@@ -36,9 +36,9 @@ and r4,r3,r4
 or r6,r4,r6
 sub r4,r4,r4
 add r2,r6,r2
-add r1,r2,r1
+sub r0,r0,r0
 sub r7,r7,r7
-addi r7,r7,0000000000001011
+addi r7,r7,0000000000001100
 sub r16,r16,r16
 sub r17,r17,r17
 and r1,r2,r16
@@ -123,4 +123,8 @@ and r4,r3,r4
 or r6,r4,r6
 sub r4,r4,r4
 add r2,r6,r2
+subi r7,r7,0000000000000001
+bne r0,r7,1111111110101010
+add r1,r0,r1
+add r2,r0,r2
 hal
