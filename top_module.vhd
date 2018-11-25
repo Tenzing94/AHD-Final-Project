@@ -35,7 +35,8 @@ use IEEE.numeric_std.all;
 entity top_module is
     Port ( clk : in STD_LOGIC;
            rst : in STD_LOGIC;
-           output : out STD_LOGIC_VECTOR (31 downto 0);
+           outputA : out STD_LOGIC_VECTOR (31 downto 0);
+           outputB : out STD_LOGIC_VECTOR (31 downto 0);
            bit_flags : out STD_LOGIC_VECTOR (8 downto 0); -- LED output
            hal : out STD_LOGIC
           );
@@ -162,6 +163,12 @@ signal pcJump : std_logic_vector (31 downto 0);
 
 signal currentInst : std_logic_vector (31 downto 0);
 
+-- RF
+signal instRF1 : std_logic_vector (4 downto 0);
+signal instRF2 : std_logic_vector (4 downto 0);
+signal RF1 : std_logic_vector (4 downto 0);
+signal RF2 : std_logic_vector (4 downto 0);
+
 signal sourceA : std_logic_vector (31 downto 0);
 signal register2 : std_logic_vector (31 downto 0);
 signal sourceB : std_logic_vector (31 downto 0);
@@ -208,11 +215,24 @@ cALUSrc <= tempCoontrolReg(2);
 cRegDst <= tempCoontrolReg(1);
 cRegWrite <= tempCoontrolReg(0);
 
+--RF
+
+instRF1 <=  currentInst( 25 downto 21);
+instRF2 <= currentInst( 20 downto 16 );
+
+with currentInst( 31 downto 26 ) select
+    RF1 <= "00001" when "111111",
+            instRF1 when others; 
+
+with currentInst( 31 downto 26 ) select
+    RF2 <= "00010" when "111111",
+            instRF2 when others; 
+
 -- Main Components
 
 pc1: pc PORT MAP(in_pc => demux_pc, clr => rst, clk => clk, out_pc => progCounter );
 imem0: imem PORT MAP( in_pc => progCounter, out_imem => currentInst);
-rf0: rf PORT Map ( clk => clk, WE3 => cRegWrite, A1 => currentInst( 25 downto 21), A2 => currentInst( 20 downto 16 ), A3 => currentInst_A3 , WD3 => result , RD1 => sourceA, RD2 => register2 );
+rf0: rf PORT Map ( clk => clk, WE3 => cRegWrite, A1 => RF1, A2 => RF2, A3 => currentInst_A3 , WD3 => result , RD1 => sourceA, RD2 => register2 );
 alu0: ALU_FPGA PORT MAP( SrcA => sourceA, SrcB => sourceB, ALU_Control => cALUOpcode, ALU_Result => ALUResult, Flag_Zero => zero, Flag_Negative => negative );
 cu0: control_unit PORT MAP( opcode => currentInst( 31 downto 26), funct => currentInst( 5 downto 0), controlReg => tempCoontrolReg );
 dmem0: dmem PORT MAP ( clk => clk, WE => cMemWrite, A => ALUResult, WD => register2, RD => memReadData );
@@ -245,11 +265,22 @@ with currentInst( 31 downto 26 ) select
     demux_pc <= pcJump when b"001100",      --Jump
                 progCounter when b"111111",                               --Halt
                 in_pc when others;                                 -- Normal inst
-                    
+
+--Selecting output    
+
+
+-- Select Output B
 with currentInst( 31 downto 26 ) select
-    output <=  X"00000000" when "111111",
+    outputB <= register2 when "111111",
+               result when others;
+               
+-- Select Output A                                   
+with currentInst( 31 downto 26 ) select
+    outputA <= sourceA when "111111",
                result when others;
 
+
+-- Toggle HAL
 with currentInst( 31 downto 26 ) select
     hal <=  '1' when "111111",
             '0' when others;
