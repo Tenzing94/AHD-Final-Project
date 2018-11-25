@@ -31,7 +31,7 @@ end component;
     -- clock-specific signals
     signal tClk : std_logic := '0'; -- init. the clock (required!)
     constant clk_period : time := 10 ns; -- modifiable clock period
-    constant tCompletion : time := 5 s;
+    constant cycle_time : time := 50000000 ps; -- avg + buffer time to reach a HALT command
     
 begin
     -- // Testbench Components // --    
@@ -59,10 +59,10 @@ begin
        -- reset the CPU     
        -- hold reset state high for 100ns
        tRst <= '1';
-       wait for clk_period*100;
+       wait for clk_period;
 
        -- start cpu (starts the PC) 
        tRst <='0';
-        wait for tCompletion;
+       wait for cycle_time;
     end process;
 end testbench;
