@@ -35,7 +35,6 @@ entity super_top_module is
     Port ( CLK100MHZ : in STD_LOGIC; -- internal clock
            BTNC      : in STD_LOGIC; -- clock button
            BTNU      : in STD_LOGIC; -- reset button
-           SW        : in STD_LOGIC_VECTOR(0 downto 0); -- SW[0], toggles between slow clock and clock button
            CA        : out  std_logic_vector (6 downto 0); -- Cathodes
            AN        : out  std_logic_vector (7 downto 0); -- Anodes
            LED       : out STD_LOGIC_VECTOR (15 downto 0) -- LED output
@@ -87,10 +86,9 @@ end component;
 
 
 ------------------------------ SIGNALS ------------------------------
-signal sig_clk_100Mhz, sig_clk_slow, sig_clk_for_ssd : std_logic;
+signal sig_clk_100Mhz, sig_clk_for_ssd : std_logic;
 signal sig_BTNC : std_logic;
 signal sig_SW_clk : std_logic;
-signal sig_clock_in : std_logic;
 signal sig_clock_button, sig_reset_button : std_logic;
 signal sig_output : std_logic_vector(31 downto 0);
 signal sig_bit_flags : std_logic_vector(8 downto 0);
@@ -102,24 +100,14 @@ begin
 
 ------------------------------ PORT MAPS ------------------------------
 DBBTNC  : debouncer PORT MAP (clk => sig_clk_100Mhz, button_in => sig_BTNC, pulse_out => sig_clock_button);
-CLKSLOW : clk_slow PORT MAP (clk_in => sig_clk_100Mhz, clk_out => sig_clk_slow);
-TOP     : top_module PORT MAP (clk => sig_clock_in, rst => sig_reset_button, output => sig_output, bit_flags => sig_bit_flags, hal =>  hal);
+TOP     : top_module PORT MAP (clk => sig_clock_button, rst => sig_reset_button, output => sig_output, bit_flags => sig_bit_flags, hal =>  hal);
 CLKSSD  : clk_for_ssd PORT MAP (clk_in => sig_clk_100Mhz, clk_out => sig_clk_for_ssd);
 SSD     : seven_seg PORT MAP (clk_for_ssd => sig_clk_for_ssd, ss_input => sig_output, Cathode_Pattern => sig_cathode, AN_Activate => sig_anode);
 
-process(sig_SW_clk)
-begin
-    if (sig_SW_clk = '0') then
-        sig_clock_in <= sig_clk_slow;
-    else
-        sig_clock_in <= sig_clock_button;
-    end if;
-end process;
 
 sig_clk_100Mhz <= CLK100MHZ;
 sig_BTNC <= BTNC;
 sig_reset_button <= BTNU; -- no need for a debouncer for the reset button
-sig_SW_clk <= SW(0);
 CA <= sig_cathode;
 AN <= sig_anode;
 LED(8 downto 0) <= sig_bit_flags;
