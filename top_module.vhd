@@ -2,9 +2,9 @@
 -- Company: 
 -- Engineer: 
 -- 
--- Create Date: 11/14/2018 10:51:28 PM
+-- Create Date: 11/06/2018 05:12:03 PM
 -- Design Name: 
--- Module Name: super_top_module - Behavioral
+-- Module Name: top_module - Behavioral
 -- Project Name: 
 -- Target Devices: 
 -- Tool Versions: 
@@ -21,6 +21,7 @@
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.numeric_std.all;
 
 -- Uncomment the following library declaration if using
 -- arithmetic functions with Signed or Unsigned values
@@ -31,129 +32,264 @@ use IEEE.STD_LOGIC_1164.ALL;
 --library UNISIM;
 --use UNISIM.VComponents.all;
 
-entity super_top_module is
-    Port ( CLK100MHZ : in STD_LOGIC; -- internal clock
-           BTNC      : in STD_LOGIC; -- clock button -- DEBOUNCER YES
-           BTNU      : in STD_LOGIC; -- reset button -- DEBOUNCER NO
-           BTND      : in STD_LOGIC; -- clock select (select between internal slow clock and the clock button) -- DEBOUNCER YES
-           BTNL      : in STD_LOGIC; -- input button (input from the switch goes into the dmem inside top module) -- DEBOUNCER YES
-           BTNR      : in STD_LOGIC; -- display button (if button is pressed, r2 (B value) is shown on sseg. Else r1 (A value) is shown) -- DEBOUNCER NO
-           SW        : in std_logic_vector (15 downto 0);
-           CA        : out  std_logic_vector (6 downto 0); -- Cathodes
-           AN        : out  std_logic_vector (7 downto 0); -- Anodes
-           LED       : out STD_LOGIC_VECTOR (15 downto 0) -- LED output
-      );
-end super_top_module;
-
-
-architecture Behavioral of super_top_module is
-
------------------------------- COMPONENTS ------------------------------
-component debouncer is
-    port(   clk : in std_logic; -- 100MHZ internal clock
-            button_in : in std_logic;
-            pulse_out : out std_logic
-        );
-end component;
-
-component clk_slow is
-    Port (
-        clk_in : in  STD_LOGIC;
-        clk_out: out STD_LOGIC
-    );
-end component;
-
-component top_module is
-    Port ( clk       : in STD_LOGIC;
-           rst       : in STD_LOGIC;
-           outputA   : out STD_LOGIC_VECTOR (31 downto 0);
-           outputB   : out STD_LOGIC_VECTOR (31 downto 0);
+entity top_module is
+    Port ( clk : in STD_LOGIC;
+           rst : in STD_LOGIC;
+           outputA : out STD_LOGIC_VECTOR (31 downto 0);
+           outputB : out STD_LOGIC_VECTOR (31 downto 0);
            bit_flags : out STD_LOGIC_VECTOR (8 downto 0); -- LED output
-           hal       : out STD_LOGIC;
+           hal : out STD_LOGIC;
            backdoor_input_button : in STD_LOGIC;
            backdoor_input_values : in STD_LOGIC_VECTOR (15 downto 0)
           );
+end top_module;
+
+architecture Behavioral of top_module is
+
+-- Component PC
+component pc
+    Port ( in_pc : in STD_LOGIC_VECTOR (31 downto 0);
+       clr : in STD_LOGIC;
+       clk : in STD_LOGIC;
+       out_pc : out STD_LOGIC_VECTOR (31 downto 0));
 end component;
 
-component clk_for_ssd is
-    Port (
-        clk_in : in  STD_LOGIC;
-        clk_out: out STD_LOGIC
-    );
-end component;
-
-component seven_seg is
+-- Component Imem
+component imem
     Port ( 
-           clk_for_ssd        : in std_logic; -- used by the seven seg display
-           ss_input          : in std_logic_vector (31 downto 0); -- outputA from the top_module
-           Cathode_Pattern    : out std_logic_vector (6 downto 0);
-           AN_Activate        : out std_logic_vector (7 downto 0)
-			);
+       in_pc : in std_logic_vector (31 downto 0);
+       out_imem : out std_logic_vector (31 downto 0));
 end component;
 
+-- Component RF
 
------------------------------- SIGNALS ------------------------------
-signal sig_clk_100Mhz, sig_clk_slow, sig_clk_for_ssd : std_logic;
-signal sig_BTNC, sig_BTND, sig_BTNL : std_logic;
-signal sig_SW_clk : std_logic;
-signal sig_clock_button, sig_clock_select, sig_input_button : std_logic;
-signal sig_outputA, sig_outputB, sig_output : std_logic_vector(31 downto 0);
-signal sig_bit_flags : std_logic_vector(8 downto 0);
-signal sig_cathode : std_logic_vector(6 downto 0);
-signal sig_anode : std_logic_vector(7 downto 0);
-signal hal : std_logic;
-signal sig_clock_in : std_logic := '0';
+component rf
+    Port (
+        CLK, WE3   : in std_logic;
+        A1, A2, A3 : in std_logic_vector(4 downto 0);
+        WD3        : in std_logic_vector(31 downto 0);   
+        RD1, RD2   : out std_logic_vector(31 downto 0));
+end component;
 
-signal sig_toggle_clk : std_logic := '0'; -- toggle between internal slow clock and clock button
+-- Component Control Unit
+component control_unit
+    Port ( opCode : in STD_LOGIC_VECTOR (5 downto 0);
+       funct : in STD_LOGIC_VECTOR (5 downto 0);
+       controlReg : out STD_LOGIC_VECTOR (8 downto 0));
+end component;
+
+-- component FlipFlop 1-bit
+component FF1bit
+    Port (
+        clk, input : in std_logic;
+        output     : out std_logic);
+end component;
+
+-- Component Sign Extend
+component signextend
+    Port (
+        input  : in std_logic_vector(15 downto 0);
+        output : out std_logic_vector(31 downto 0));
+end component;
+
+-- component ALU
+
+component ALU_FPGA
+    Port ( SrcA : in STD_LOGIC_VECTOR (31 downto 0);
+       SrcB : in STD_LOGIC_VECTOR (31 downto 0);
+       ALU_Control : in STD_LOGIC_VECTOR (2 downto 0);
+       ALU_Result : out STD_LOGIC_VECTOR (31 downto 0);
+       Flag_Zero : out STD_LOGIC;
+       Flag_Negative : out STD_Logic);
+end component;
+
+ -- component DMEM
+ component dmem
+     Port ( 
+         CLK, WE : in std_logic;
+         A, WD   : in std_logic_vector(31 downto 0);
+         RD      : out std_logic_vector(31 downto 0);
+         backdoor_input_button : in STD_LOGIC;
+         backdoor_input_values : in STD_LOGIC_VECTOR (15 downto 0)
+         );
+ end component;
+ 
+ 
+ --  Component MUX32
+ 
+ component mux32bit2to1
+     Port (
+         SEL       : in std_logic;
+         A, B      : in std_logic_vector(31 downto 0);
+         X         : out std_logic_vector(31 downto 0));
+ end component;
+
+ --  Component MUX5
+ 
+ component mux5bit2to1
+     Port (
+         SEL       : in std_logic;
+         A, B      : in std_logic_vector(4 downto 0);
+         X         : out std_logic_vector(4 downto 0));
+ end component;
+
+
+-- Compunent SignExtt
+component signextent
+    Port (
+        input  : in std_logic_vector(15 downto 0);
+        output : out std_logic_vector(31 downto 0));
+end component;
+
+-- Left shift Component
+component Shift_Left_Func is
+    Port ( A_Source : in STD_LOGIC_VECTOR (31 downto 0);
+           Shift_Amt : in STD_LOGIC_VECTOR (4 downto 0);
+           Output_Val : out STD_LOGIC_VECTOR (31 downto 0);
+           Zero_Flag : out STD_LOGIC);
+end component;
+
+-- Component Add 
+component Add_Func
+    Port ( A_Source : in STD_LOGIC_VECTOR (31 downto 0);
+           B_Source : in STD_LOGIC_VECTOR (31 downto 0);
+           Output_Val : out STD_LOGIC_VECTOR (31 downto 0);
+           Zero_Flag : out STD_LOGIC);
+end component;
+
+-- Signals
+
+signal in_pc : std_logic_vector (31 downto 0) := X"00000000";
+signal demux_pc: std_logic_vector (31 downto 0);
+signal progCounter : std_logic_vector (31 downto 0);
+signal pcPlus4 : std_logic_vector (31 downto 0);
+signal pcBranch : std_logic_vector (31 downto 0);
+signal pcJump : std_logic_vector (31 downto 0);
+
+signal currentInst : std_logic_vector (31 downto 0);
+
+-- RF
+signal instRF1 : std_logic_vector (4 downto 0);
+signal instRF2 : std_logic_vector (4 downto 0);
+signal RF1 : std_logic_vector (4 downto 0);
+signal RF2 : std_logic_vector (4 downto 0);
+
+signal sourceA : std_logic_vector (31 downto 0);
+signal register2 : std_logic_vector (31 downto 0);
+signal sourceB : std_logic_vector (31 downto 0);
+signal currentInst_A3 : std_logic_vector (4 downto 0);
+
+signal signImm : std_logic_vector (31 downto 0);
+signal signImmLeftShift : std_logic_vector (31 downto 0);
+
+signal ALUResult : std_logic_vector (31 downto 0);
+signal zero: std_logic;
+signal negative: std_logic;
+signal orOp: std_logic;
+
+
+signal memReadData : std_logic_vector (31 downto 0);
+
+signal result : std_logic_vector (31 downto 0);
+
+
+-- Control signals
+signal cPCsrc: std_logic;
+signal cMemToReg: std_logic;
+signal cMemWrite: std_logic;
+signal cBranch: std_logic;
+signal cALUOpcode: std_logic_vector(2 downto 0);
+signal cALUSrc: std_logic;
+signal cRegDst: std_logic;
+signal cRegWrite: std_logic;
+signal tempCoontrolReg : std_logic_vector ( 8 downto 0 );
+
+constant two : std_logic_vector( 4 downto 0 ) := "00010";
+constant four : std_logic_vector( 31 downto 0 ) := X"00000004";
+constant one : std_logic_vector( 31 downto 0 ) := X"00000001";
 
 begin
 
------------------------------- PORT MAPS ------------------------------
-DBBTNC  : debouncer PORT MAP (clk => sig_clk_100Mhz, button_in => sig_BTNC, pulse_out => sig_clock_button);
-DBBTND  : debouncer PORT MAP (clk => sig_clk_100Mhz, button_in => sig_BTND, pulse_out => sig_clock_select);
-DBBTNL  : debouncer PORT MAP (clk => sig_clk_100Mhz, button_in => sig_BTNL, pulse_out => sig_input_button);
-CLKSLOW : clk_slow PORT MAP (clk_in => sig_clk_100Mhz, clk_out => sig_clk_slow);
-TOP     : top_module PORT MAP (clk => sig_clock_in, rst => BTNU,outputA => sig_outputA, outputB => sig_outputB, bit_flags => sig_bit_flags, hal =>  hal, backdoor_input_button => sig_input_button, backdoor_input_values => SW);
-CLKSSD  : clk_for_ssd PORT MAP (clk_in => sig_clk_100Mhz, clk_out => sig_clk_for_ssd);
-SSD     : seven_seg PORT MAP (clk_for_ssd => sig_clk_for_ssd, ss_input => sig_output, Cathode_Pattern => sig_cathode, AN_Activate => sig_anode);
+-- Define control Reg
+
+cMemToReg <= tempCoontrolReg(8);
+cMemWrite <= tempCoontrolReg(7);
+cBranch <= tempCoontrolReg(6);
+cALUOpcode <= tempCoontrolReg(5 downto 3);
+cALUSrc <= tempCoontrolReg(2);
+cRegDst <= tempCoontrolReg(1);
+cRegWrite <= tempCoontrolReg(0);
+
+--RF
+
+instRF1 <=  currentInst( 25 downto 21);
+instRF2 <= currentInst( 20 downto 16 );
+
+with currentInst( 31 downto 26 ) select
+    RF1 <= "00001" when "111111",
+            instRF1 when others; 
+
+with currentInst( 31 downto 26 ) select
+    RF2 <= "00010" when "111111",
+            instRF2 when others; 
+
+-- Main Components
+
+pc1: pc PORT MAP(in_pc => demux_pc, clr => rst, clk => clk, out_pc => progCounter );
+imem0: imem PORT MAP( in_pc => progCounter, out_imem => currentInst);
+rf0: rf PORT Map ( clk => clk, WE3 => cRegWrite, A1 => RF1, A2 => RF2, A3 => currentInst_A3 , WD3 => result , RD1 => sourceA, RD2 => register2 );
+alu0: ALU_FPGA PORT MAP( SrcA => sourceA, SrcB => sourceB, ALU_Control => cALUOpcode, ALU_Result => ALUResult, Flag_Zero => zero, Flag_Negative => negative );
+cu0: control_unit PORT MAP( opcode => currentInst( 31 downto 26), funct => currentInst( 5 downto 0), controlReg => tempCoontrolReg );
+dmem0: dmem PORT MAP ( clk => clk, WE => cMemWrite, A => ALUResult, WD => register2, RD => memReadData, backdoor_input_button => backdoor_input_button, backdoor_input_values => backdoor_input_values);
 
 
-sig_clk_100Mhz <= CLK100MHZ;
-sig_BTNC <= BTNC;
-sig_BTND <= BTND;
-sig_BTNL <= BTNL;
-CA <= sig_cathode;
-AN <= sig_anode;
-LED(8 downto 0) <= sig_bit_flags;
+-- MUX and other components
 
-with hal select
-    LED(15) <= '1' when '1',
-                        '0' when others;
+mux0: mux32bit2to1 PORT MAP( SEL => cPCsrc, A => pcPlus4, B => pcBranch, X => in_pc );
+mux1: mux5bit2to1 PORT MAP( SEL => cRegDst, A => currentInst( 20 downto 16 ), B => currentInst( 15 downto 11 ), X => currentInst_A3 );
+mux2: mux32bit2to1 PORT MAP( SEL => cALUSrc, A => register2, B => signImm, X => sourceB );
+mux3: mux32bit2to1 PORT MAP( SEL => cMemToReg, A => ALUResult, B => memReadData, X => result);
+se0: signextend PORT MAP ( input => currentInst( 15 downto 0), output => signImm );
+ls0: Shift_Left_Func PORT MAP ( A_Source => signImm, Shift_Amt => two , Output_Val => signImmLeftShift);
+adder1: Add_Func PORT MAP ( A_Source => progCounter, B_Source => four , Output_Val => pcPlus4 );
+adder2: Add_Func PORT MAP ( A_Source => signImmLeftShift , B_Source => pcPlus4 , Output_Val => pcBranch );
 
-LED(9) <= sig_input_button;
-LED(10) <= BTNU;
-LED(11) <= sig_clock_button;
-LED(12) <= sig_clock_select;
-LED(13) <= BTNR;
+-- Branch signal
+--Branch using MUX
+with currentInst( 31 downto 26 ) select
+    orOp <=   negative when "001001",            --BLT    
+              not zero when "001011",            --BNE
+              zero when others;                  --BEQ
 
-process(sig_clock_select)
-begin
-    if (sig_clock_select'event and sig_clock_select = '1') then
-        if(sig_toggle_clk = '1') then
-            sig_toggle_clk <= '0';
-        elsif(sig_toggle_clk = '0') then
-            sig_toggle_clk <= '1';
-        end if;
-                  
-    end if;
-end process;
+cPCsrc <= cBranch AND orOp;
 
-with sig_toggle_clk select
-     sig_clock_in  <= sig_clk_slow when '1',
-                      sig_clock_button when others;
+pcJump <=  in_pc(31 downto 28) & currentInst(25 downto 0) & "00";
 
-with BTNR select
-    sig_output <= sig_outputA when '0',
-                  sig_outputB when '1';
+-- PC depends  jump, halt or normal
+with currentInst( 31 downto 26 ) select
+    demux_pc <= pcJump when b"001100",      --Jump
+                progCounter when b"111111",                               --Halt
+                in_pc when others;                                 -- Normal inst
+
+--Selecting output    
+
+
+-- Select Output B
+with currentInst( 31 downto 26 ) select
+    outputB <= register2 when "111111",
+               result when others;
+               
+-- Select Output A                                   
+with currentInst( 31 downto 26 ) select
+    outputA <= sourceA when "111111",
+               result when others;
+
+
+-- Toggle HAL
+with currentInst( 31 downto 26 ) select
+    hal <=  '1' when "111111",
+            '0' when others;
+
+bit_flags <= tempCoontrolReg; -- This will be the sent to the LED as output
 
 end Behavioral;
