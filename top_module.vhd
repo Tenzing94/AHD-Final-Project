@@ -38,7 +38,9 @@ entity top_module is
            outputA : out STD_LOGIC_VECTOR (31 downto 0);
            outputB : out STD_LOGIC_VECTOR (31 downto 0);
            bit_flags : out STD_LOGIC_VECTOR (8 downto 0); -- LED output
-           hal : out STD_LOGIC
+           hal : out STD_LOGIC;
+           backdoor_input_button : in STD_LOGIC;
+           backdoor_input_values : in STD_LOGIC_VECTOR (15 downto 0)
           );
 end top_module;
 
@@ -106,7 +108,10 @@ end component;
      Port ( 
          CLK, WE : in std_logic;
          A, WD   : in std_logic_vector(31 downto 0);
-         RD      : out std_logic_vector(31 downto 0));
+         RD      : out std_logic_vector(31 downto 0);
+         backdoor_input_button : in STD_LOGIC;
+         backdoor_input_values : in STD_LOGIC_VECTOR (15 downto 0)
+         );
  end component;
  
  
@@ -235,7 +240,7 @@ imem0: imem PORT MAP( in_pc => progCounter, out_imem => currentInst);
 rf0: rf PORT Map ( clk => clk, WE3 => cRegWrite, A1 => RF1, A2 => RF2, A3 => currentInst_A3 , WD3 => result , RD1 => sourceA, RD2 => register2 );
 alu0: ALU_FPGA PORT MAP( SrcA => sourceA, SrcB => sourceB, ALU_Control => cALUOpcode, ALU_Result => ALUResult, Flag_Zero => zero, Flag_Negative => negative );
 cu0: control_unit PORT MAP( opcode => currentInst( 31 downto 26), funct => currentInst( 5 downto 0), controlReg => tempCoontrolReg );
-dmem0: dmem PORT MAP ( clk => clk, WE => cMemWrite, A => ALUResult, WD => register2, RD => memReadData );
+dmem0: dmem PORT MAP ( clk => clk, WE => cMemWrite, A => ALUResult, WD => register2, RD => memReadData, backdoor_input_button => backdoor_input_button, backdoor_input_values => backdoor_input_values);
 
 
 -- MUX and other components
