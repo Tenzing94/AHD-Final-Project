@@ -15,18 +15,21 @@ component top_module is
     Port ( clk : in STD_LOGIC;
            rst : in STD_LOGIC;
            output : out STD_LOGIC_VECTOR (31 downto 0);
-           bit_flags : out STD_LOGIC_VECTOR (8 downto 0); -- LED output
+           bit_flags : out STD_LOGIC_VECTOR (8 downto 0);
            hal : out STD_LOGIC
+           backdoor_input_button : in std_logic;
+           backdoor_input_values : in std_logic_vector(15 downto 0);
           );
 end component;
 
     -- // Signals // --
     signal tRst : std_logic := '0';
     signal tOut : std_logic_vector(31 downto 0); -- dout
-    -- we don't have the LEDs on this testbench, so
-    -- assign them to signals.
-    signal tBit_Flags : std_logic_vector(8 downto 0); 
+    signal tBit_Flags : std_logic_vector(8 downto 0); -- led output
     signal tHal : std_logic; -- HALT signal
+    -- dmem signals
+    signal tBackdoorInput : std_logic;
+    signal tBackdoorInputVals : std_logic_vector(15 downto 0);
     
     -- clock-specific signals
     signal tClk : std_logic := '0'; -- init. the clock (required!)
@@ -34,14 +37,17 @@ end component;
     constant cycle_time : time := 50000000 ps; -- avg + buffer time to reach a HALT command
     
 begin
-    -- // Testbench Components // --    
+    -- // Testbench Components // --   
+     
     -- Top Module
     UUT: top_module port map(
             clk => tClk,
             rst => tRst,
             output => tOut,
             bit_flags => tBit_Flags,
-            hal => tHal);
+            hal => tHal,
+            backdoor_input_button => tBackdoorInput,
+            backdoor_input_values => tBackdoorInputVals);
             
             
    -- Clock process (how the clock should behave)
@@ -59,6 +65,7 @@ begin
        -- reset the CPU     
        -- hold reset state high for 100ns
        tRst <= '1';
+       -- TODO: Add in dmem configuration
        wait for clk_period;
 
        -- start cpu (starts the PC) 
