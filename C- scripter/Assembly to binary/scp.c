@@ -17,26 +17,23 @@ int getOpcode( char command[5], char* opcode )
 	char jmp[6] = "001100";
 	char hal[6] = "111111";
 	
-	
-	printf("Command - %s\n", command);
-	
-	if (strcmp(command,"add ") == 0)
+	if (strcmp(command,"add") == 0)
 	{
 		strcpy(opcode, rtype);
 	}
-	else if (strcmp(command,"sub ") == 0)
+	else if (strcmp(command,"sub") == 0)
 	{
 		strcpy(opcode, rtype);
 	}
-	else if (strcmp(command,"and ") == 0)
+	else if (strcmp(command,"and") == 0)
 	{
 		strcpy(opcode, rtype);
 	}
-	else if (strcmp(command,"or1 ") == 0)
+	else if (strcmp(command,"or") == 0)
 	{
 		strcpy(opcode, rtype);
 	}
-	else if (strcmp(command,"nor ") == 0)
+	else if (strcmp(command,"nor") == 0)
 	{
 		strcpy(opcode, rtype);
 	}
@@ -52,44 +49,43 @@ int getOpcode( char command[5], char* opcode )
 	{
 		strcpy(opcode, andi);
 	}
-	else if (strcmp(command,"ori ") == 0)
+	else if (strcmp(command,"ori") == 0)
 	{
 		strcpy(opcode, ori);
 	}
-	else if (strcmp(command,"shl ") == 0)
+	else if (strcmp(command,"shl") == 0)
 	{
 		strcpy(opcode, shl);
 	}
-	else if (strcmp(command,"lw1 ") == 0)
+	else if (strcmp(command,"lw") == 0)
 	{
 		strcpy(opcode, lw);
 	}
-	else if (strcmp(command,"sw1 ") == 0)
+	else if (strcmp(command,"sw") == 0)
 	{
 		strcpy(opcode, sw);
 	}
-	else if (strcmp(command,"blt ") == 0)
+	else if (strcmp(command,"blt") == 0)
 	{
 		strcpy(opcode, blt);
 	}
-	else if (strcmp(command,"beq ") == 0)
+	else if (strcmp(command,"beq") == 0)
 	{
 		strcpy(opcode, beq);
 	}
-	else if (strcmp(command,"bne ") == 0)
+	else if (strcmp(command,"bne") == 0)
 	{
 		strcpy(opcode, bne);
 	}
-	else if (strcmp(command,"jmp ") == 0)
+	else if (strcmp(command,"jmp") == 0)
 	{
 		strcpy(opcode, jmp);
 	}
-	else if (strcmp(command,"hal ") == 0)
+	else if (strcmp(command,"hal") == 0)
 	{
 		strcpy(opcode, hal);
 	}
-	
-	
+
 	return 0;
 }
 
@@ -101,27 +97,27 @@ int getFunct( char command[4], char* opcode )
 	char or1[6] = "000111";
 	char nor[6] = "001001";
 	
-	if (strcmp(command,"add ") == 0)
+	if (strcmp(command,"add") == 0)
 	{
 		strcpy(opcode, add);
 		
 	}
-	else if (strcmp(command,"sub ") == 0)
+	else if (strcmp(command,"sub") == 0)
 	{
 		strcpy(opcode, sub);
 		
 	}
-	else if (strcmp(command,"and ") == 0)
+	else if (strcmp(command,"and") == 0)
 	{
 		strcpy(opcode, and1);
 		
 	}
-	else if (strcmp(command,"or1 ") == 0)
+	else if (strcmp(command,"or") == 0)
 	{
 		strcpy(opcode, or1);
 		
 	}
-	else if (strcmp(command,"nor ") == 0)
+	else if (strcmp(command,"nor") == 0)
 	{
 		strcpy(opcode, nor);
 		
@@ -131,42 +127,40 @@ int getFunct( char command[4], char* opcode )
 	return 0;
 }
 
-int getRegister(char reg[3], char* opcode)
+int getRegister(char reg[6], char* opcode)
 {
-	char r0[5] = "00000";
+	char r0[6] = "00000\0";
 	char r1[6] = "00001\0";
-	char r2[5] = "00010";
-	char r3[5] = "00011";
-	char r4[5] = "00100";
-	char r5[5] = "00101";
-	char r6[5] = "00110";
-	char r7[5] = "00111";
-	char r8[5] = "01000";
-	char r9[5] = "01001";
-	char r10[5] = "01010";
-	char r11[5] = "01011";
-	char r12[5] = "01100";
-	char r13[5] = "01101";
-	char r14[5] = "01110";
-	char r15[5] = "01111";
-	char r16[5] = "10000";
-	char r17[5] = "10001";
-	char r18[5] = "10010";
-	char r19[5] = "10011";
-	char r20[5] = "10100";
-	char r21[5] = "10101";
-	char r22[5] = "10110";
-	char r23[5] = "10111";
-	char r24[5] = "11000";
-	char r25[5] = "11001";
-	char r26[5] = "11010";
-	char r27[5] = "11011";
-	char r28[5] = "11100";
-	char r29[5] = "11101";
-	char r30[5] = "11110";
-	char r31[5] = "11111";
-	
-	
+	char r2[6] = "00010\0";
+	char r3[6] = "00011\0";
+	char r4[6] = "00100\0";
+	char r5[6] = "00101\0";
+	char r6[6] = "00110\0";
+	char r7[6] = "00111\0";
+	char r8[6] = "01000\0";
+	char r9[6] = "01001\0";
+	char r10[6] = "01010\0";
+	char r11[6] = "01011\0";
+	char r12[6] = "01100\0";
+	char r13[6] = "01101\0";
+	char r14[6] = "01110\0";
+	char r15[6] = "01111\0";
+	char r16[6] = "10000\0";
+	char r17[6] = "10001\0";
+	char r18[6] = "10010\0";
+	char r19[6] = "10011\0";
+	char r20[6] = "10100\0";
+	char r21[6] = "10101\0";
+	char r22[6] = "10110\0";
+	char r23[6] = "10111\0";
+	char r24[6] = "11000\0";
+	char r25[6] = "11001\0";
+	char r26[6] = "11010\0";
+	char r27[6] = "11011\0";
+	char r28[6] = "11100\0";
+	char r29[6] = "11101\0";
+	char r30[6] = "11110\0";
+	char r31[6] = "11111\0";
 	
 	if (strcmp(reg,"r0") == 0)
 	{
@@ -309,18 +303,29 @@ int main()
 	FILE* fp, *fp1;
 	int i;
 	char buff[255];
-	char command[5], reg1[3], reg2[3], reg3[3],immediate[17];
 	fp = fopen("assemb.txt", "r");
 	fp1 = fopen("opcode.txt", "w");
 	
 	
 	while ( ( fgets(buff, 255, (FILE*)fp)) != '\0' )
 	{
-		for(i=0;i<4;i++)
+		
+		char command[5], reg1[6], reg2[6], reg3[6],immediate[17];
+		
+		i = 0;
+		int regStart = 0;
+		
+		while(buff[i] != ' ' && buff[i] != '\n')
 		{
-			command[i] = buff[i];		
+			command[i] = buff[i];
+			i++;
 		}
-		command[4] = '\0';
+		
+		command[i] = '\0';
+		regStart = i+1;
+		i=0;
+		
+		printf("Command - %s\n", command);
 		
 		char opcode[6];
 		char functOp[6];
@@ -331,27 +336,46 @@ int main()
 		char shamt2[2]="00";
 		
 		char first8[9],second8[9],thirsd8[9],fourth8[9];
+//		int regStart = 4,regStart1 = 7,regStart2 = 10;
 		
 		//Get OpCode first 6 bits
 		getOpcode(command, opcode);
 		
-		printf("\n opcode %s\n", opcode);
+		printf("\nOpcode : %s\n", opcode);
 		
 		//R-Type
 		if(strcmp(opcode,"000000") == 0)
 		{	
-			reg1[0] = buff[4];
-			reg1[1] = buff[5];
-			reg1[2] = '\0';
+			while(buff[regStart] != ',')
+			{
+				reg1[i] = buff[regStart];
+				regStart++;
+				i++;
+			}
+			reg1[i] = '\0';
+			regStart += 1;
+			i=0;
+	
+			while(buff[regStart] != ',')
+			{
+				reg2[i] = buff[regStart];
+				regStart++;
+				i++;
+			}
+			reg2[i] = '\0';
+			regStart += 1;
+			i=0;
 			
-			reg2[0] = buff[7];
-			reg2[1] = buff[8];
-			reg2[2] = '\0';
-			
-			reg3[0] = buff[10];
-			reg3[1] = buff[11];
-			reg3[2] = '\0';
-			
+			while(buff[regStart] != '\n')
+			{
+				reg3[i] = buff[regStart];
+				regStart++;
+				i++;
+			}
+			reg3[i] = '\0';
+			regStart += 1;
+			i=0;
+	
 			getFunct(command, functOp);
 			printf("funct - %s\n", functOp);
 			
@@ -412,39 +436,34 @@ int main()
 		}
 		else if( !(strcmp(opcode,"001100") == 0) && !(strcmp(opcode,"111111") == 0))		//J-Type
 		{
-			if( (strcmp(opcode,"000001") == 0) || (strcmp(opcode,"000010") == 0) || (strcmp(opcode,"000011") == 0) )
+			while(buff[regStart] != ',')
 			{
-				reg1[0] = buff[5];
-				reg1[1] = buff[6];
-				reg1[2] = '\0';
-				
-				reg2[0] = buff[8];
-				reg2[1] = buff[9];
-				reg2[2] = '\0';
-				
-				for(i=11;i<27;i++)
-				{
-					immediate[i-11] = buff[i];		
-				}
-				immediate[16] = '\0';
+				reg1[i] = buff[regStart];
+				regStart++;
+				i++;
 			}
-			else
+			reg1[i] = '\0';
+			regStart += 1;
+			i=0;
+	
+			while(buff[regStart] != ',')
 			{
-				reg1[0] = buff[4];
-				reg1[1] = buff[5];
-				reg1[2] = '\0';
-				
-				reg2[0] = buff[7];
-				reg2[1] = buff[8];
-				reg2[2] = '\0';
-				
-				for(i=10;i<26;i++)
-				{
-					immediate[i-10] = buff[i];		
-				}
-				immediate[16] = '\0';
+				reg2[i] = buff[regStart];
+				regStart++;
+				i++;
+			}
+			reg2[i] = '\0';
+			regStart += 1;
+			i=0;
+			
+			while(buff[regStart] != '\n')
+			{
+				immediate[i] = buff[regStart];	
+				regStart++;
+				i++;
 			}
 			
+			immediate[16] = '\0';
 			
 			
 			getRegister(reg1, reg1Op);
@@ -583,6 +602,8 @@ int main()
 			fprintf(fp1,"\"%s\",\"%s\",\"%s\",\"%s\",\n",first8,second8,thirsd8,fourth8);	
 			
 		}
+		
+		printf("----------------------------------\n");
 			
 	}
 		

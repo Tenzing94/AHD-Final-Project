@@ -1,0 +1,24 @@
+sub r16,r16,r16			// clear r16 (temp register)
+sub r17,r17,r17			// clear r17 (temp register)
+and r1,r2,r16			// XOR operation is r1 = ((r1 AND r2) NOR (r1 NOR r2))
+nor r1,r2,r17
+nor r16,r17,r1
+sub r16,r16,r16			// clear r16 (temp register)
+sub r17,r17,r17			// clear r17 (temp register)
+and r1,r2,r16
+nor r1,r2,r17
+nor r16,r17,r2			// XOR operation is r2 = ((r1 AND r2) NOR (r1 NOR r2))
+
+/* 1. XOR operation can be done using 1 AND GATE and 2 NOR GATES:
+ * 				-- r1 and r2 input to AND Gate
+ *				-- r1 and r2 input to 1st NOR Gate
+ *				-- output of AND Gate and 1st NOR Gate are inputs to 2nd NOR Gate
+ *				-- output of 2nd NOR Gate gives you the XOR value of r1 and r2
+ * 2. In VHDL code:
+ *				ab_xor <= a_reg xor b_reg;
+ *				ba_xor <= b_reg XOR a;
+ *				// a_reg and b_reg were the previous value of a and b. 
+ * 				// We had to do this because the two lines were being run concurrently.
+ * 				// We do not have to worry about this in C/Assembly code because the code is sequential.
+ *				// In the assembly code above, the second XOR operation is using the r1 which has been updated by the first XOR operation.
+ */

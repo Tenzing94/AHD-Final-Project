@@ -32,11 +32,13 @@ end clk_slow;
 
 architecture Behavioral of clk_slow is
     signal temporal: STD_LOGIC;
-    signal counter : integer range 0 to 49999999 := 0; -- 100MHZ/1 = 100M. 50% duty cycle is 50M. Which is 0 to 49.99M
+    -- signal counter : integer range 0 to 49999999 := 0; -- 100MHZ/1 = 100M. 50% duty cycle is 50M. Which is 0 to 49.99M
+    signal counter : integer range 0 to 49999 := 0; -- 1KHz
 begin
     frequency_divider: process (clk_in) begin
         if rising_edge(clk_in) then
-            if (counter = 49999999) then
+            -- if (counter = 49999999) then -- 1Hz
+            if (counter = 49999) then -- 1KHz
                 temporal <= NOT(temporal); -- if clk was high, then switch it to low since it has completed the period
                 counter <= 0;
             else

@@ -35,8 +35,12 @@ use IEEE.numeric_std.all;
 entity top_module is
     Port ( clk : in STD_LOGIC;
            rst : in STD_LOGIC;
-           output : out STD_LOGIC_VECTOR (31 downto 0);
-           bit_flags : out STD_LOGIC_VECTOR (8 downto 0) -- LED output
+           outputA : out STD_LOGIC_VECTOR (31 downto 0);
+           outputB : out STD_LOGIC_VECTOR (31 downto 0);
+           bit_flags : out STD_LOGIC_VECTOR (8 downto 0); -- LED output
+           hal : out STD_LOGIC;
+           backdoor_input_button : in STD_LOGIC;
+           backdoor_input_values : in STD_LOGIC_VECTOR (15 downto 0)
           );
 end top_module;
 
@@ -104,7 +108,10 @@ end component;
      Port ( 
          CLK, WE : in std_logic;
          A, WD   : in std_logic_vector(31 downto 0);
-         RD      : out std_logic_vector(31 downto 0));
+         RD      : out std_logic_vector(31 downto 0);
+         backdoor_input_button : in STD_LOGIC;
+         backdoor_input_values : in STD_LOGIC_VECTOR (15 downto 0)
+         );
  end component;
  
  
@@ -161,6 +168,12 @@ signal pcJump : std_logic_vector (31 downto 0);
 
 signal currentInst : std_logic_vector (31 downto 0);
 
+-- RF
+signal instRF1 : std_logic_vector (4 downto 0);
+signal instRF2 : std_logic_vector (4 downto 0);
+signal RF1 : std_logic_vector (4 downto 0);
+signal RF2 : std_logic_vector (4 downto 0);
+
 signal sourceA : std_logic_vector (31 downto 0);
 signal register2 : std_logic_vector (31 downto 0);
 signal sourceB : std_logic_vector (31 downto 0);
@@ -207,14 +220,27 @@ cALUSrc <= tempCoontrolReg(2);
 cRegDst <= tempCoontrolReg(1);
 cRegWrite <= tempCoontrolReg(0);
 
+--RF
+
+instRF1 <=  currentInst( 25 downto 21);
+instRF2 <= currentInst( 20 downto 16 );
+
+with currentInst( 31 downto 26 ) select
+    RF1 <= "00001" when "111111",
+            instRF1 when others; 
+
+with currentInst( 31 downto 26 ) select
+    RF2 <= "00010" when "111111",
+            instRF2 when others; 
+
 -- Main Components
 
 pc1: pc PORT MAP(in_pc => demux_pc, clr => rst, clk => clk, out_pc => progCounter );
 imem0: imem PORT MAP( in_pc => progCounter, out_imem => currentInst);
-rf0: rf PORT Map ( clk => clk, WE3 => cRegWrite, A1 => currentInst( 25 downto 21), A2 => currentInst( 20 downto 16 ), A3 => currentInst_A3 , WD3 => result , RD1 => sourceA, RD2 => register2 );
+rf0: rf PORT Map ( clk => clk, WE3 => cRegWrite, A1 => RF1, A2 => RF2, A3 => currentInst_A3 , WD3 => result , RD1 => sourceA, RD2 => register2 );
 alu0: ALU_FPGA PORT MAP( SrcA => sourceA, SrcB => sourceB, ALU_Control => cALUOpcode, ALU_Result => ALUResult, Flag_Zero => zero, Flag_Negative => negative );
 cu0: control_unit PORT MAP( opcode => currentInst( 31 downto 26), funct => currentInst( 5 downto 0), controlReg => tempCoontrolReg );
-dmem0: dmem PORT MAP ( clk => clk, WE => cMemWrite, A => ALUResult, WD => register2, RD => memReadData );
+dmem0: dmem PORT MAP ( clk => clk, WE => cMemWrite, A => ALUResult, WD => register2, RD => memReadData, backdoor_input_button => backdoor_input_button, backdoor_input_values => backdoor_input_values);
 
 
 -- MUX and other components
@@ -229,8 +255,12 @@ adder1: Add_Func PORT MAP ( A_Source => progCounter, B_Source => four , Output_V
 adder2: Add_Func PORT MAP ( A_Source => signImmLeftShift , B_Source => pcPlus4 , Output_Val => pcBranch );
 
 -- Branch signal
+--Branch using MUX
+with currentInst( 31 downto 26 ) select
+    orOp <=   negative when "001001",            --BLT    
+              not zero when "001011",            --BNE
+              zero when others;                  --BEQ
 
-orOp <= zero OR negative;
 cPCsrc <= cBranch AND orOp;
 
 pcJump <=  in_pc(31 downto 28) & currentInst(25 downto 0) & "00";
@@ -238,11 +268,27 @@ pcJump <=  in_pc(31 downto 28) & currentInst(25 downto 0) & "00";
 -- PC depends  jump, halt or normal
 with currentInst( 31 downto 26 ) select
     demux_pc <= pcJump when b"001100",      --Jump
-                demux_pc when b"111111",                               --Halt
+                progCounter when b"111111",                               --Halt
                 in_pc when others;                                 -- Normal inst
-                    
 
-output <= result;
+--Selecting output    
+
+
+-- Select Output B
+with currentInst( 31 downto 26 ) select
+    outputB <= register2 when "111111",
+               result when others;
+               
+-- Select Output A                                   
+with currentInst( 31 downto 26 ) select
+    outputA <= sourceA when "111111",
+               result when others;
+
+
+-- Toggle HAL
+with currentInst( 31 downto 26 ) select
+    hal <=  '1' when "111111",
+            '0' when others;
 
 bit_flags <= tempCoontrolReg; -- This will be the sent to the LED as output
 
