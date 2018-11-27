@@ -52,9 +52,8 @@ begin
             backdoor_input_button => tBackdoorInput,
             backdoor_input_values => tBackdoorInputVals);
    
-
    -- Clock process (how the clock should behave)
-    clk_process :process
+    clk_process : process
     begin
          tClk <= '0';
          wait for clk_period/2;
@@ -68,23 +67,32 @@ begin
        -- reset the CPU     
        -- hold reset state high for 100ns
        tRst <= '1';
-       wait for 20 ns;
-       tRst <= '0';
-       tBackdoorInputVals <= "0000000000000000";
-       wait for clk_period/2;
-       tBackdoorInput <= '1';
-       wait for clk_period/2;
-
-       tBackdoorInputVals <= "0000000000000000";
-       wait for clk_period/2;
-       tBackdoorInput <= '1';
-       wait for clk_period/2;
-        
-              
        wait for clk_period;
-
-       -- start cpu (starts the PC) 
-       tRst <='0';
+       
+       -- reset is off
+       tRst <= '0';
+       
+       
+       -- button depressed
+       tBackdoorInput <= '0';
+       wait for clk_period/2;
+       -- input val
+       tBackdoorInputVals <= "0000000000000000";
+      -- press button
+       tBackdoorInput <= '1';
+       wait for clk_period/2;
+       
+       
+       -- button depressed
+       tBackdoorInput <= '0';
+       wait for clk_period/2;
+       -- input val
+       tBackdoorInputVals <= "0000000000000000";
+      -- press button
+       tBackdoorInput <= '1';
+       wait for clk_period/2;
+       
+      tBackdoorInput <= '0';
        wait for cycle_time;
     end process;
 end testbench;
