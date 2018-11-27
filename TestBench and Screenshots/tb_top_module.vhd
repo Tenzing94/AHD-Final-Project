@@ -73,20 +73,39 @@ begin
        tRst <= '0';
        
        
+       --// Register A //-- 
        -- button depressed
        tBackdoorInput <= '0';
        wait for clk_period/2;
-       -- input val
+       -- input val - 16b of A
        tBackdoorInputVals <= "0000000000000000";
       -- press button
        tBackdoorInput <= '1';
        wait for clk_period/2;
        
-       
        -- button depressed
        tBackdoorInput <= '0';
        wait for clk_period/2;
-       -- input val
+       -- input val - 16b of A
+       tBackdoorInputVals <= "0000000000000000";
+      -- press button
+       tBackdoorInput <= '1';
+       wait for clk_period/2;
+       
+       -- // Reigster B // --
+      -- button depressed
+       tBackdoorInput <= '0';
+       wait for clk_period/2;
+       -- input val - 16b of A
+       tBackdoorInputVals <= "0000000000000000";
+      -- press button
+       tBackdoorInput <= '1';
+       wait for clk_period/2;
+       
+      -- button depressed
+       tBackdoorInput <= '0';
+       wait for clk_period/2;
+       -- input val - 16b of A
        tBackdoorInputVals <= "0000000000000000";
       -- press button
        tBackdoorInput <= '1';
