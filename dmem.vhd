@@ -27,9 +27,7 @@ entity dmem is
     Port ( 
             CLK, WE : in std_logic;
             A, WD   : in std_logic_vector(31 downto 0);
-            RD      : out std_logic_vector(31 downto 0);
-            backdoor_input_button : in STD_LOGIC;
-            backdoor_input_values : in STD_LOGIC_VECTOR (15 downto 0)          
+            RD      : out std_logic_vector(31 downto 0)         
     );
 end dmem;
 
@@ -305,52 +303,14 @@ signal RAM : RAM_Type := (
 );
 
 signal sig_input : std_logic_vector(15 downto 0);
-signal sig_toggle_input : std_logic_vector(3 downto 0) := "0000";
-signal a_temp : std_logic_vector(31 downto 0);
-signal WD_temp : std_logic_vector(15 downto 0);
-signal WE_temp : std_logic := '0';
 
 begin
 
-    with sig_toggle_input select
-        a_temp <= x"00000034" when "0000",
-                  x"00000035" when "0001",
-                  x"00000036" when "0010",
-                  x"00000037" when "0011",
-                  A when others;
-             
-    with sig_toggle_input select
-        WD_temp <= backdoor_input_values when "0000",
-                   backdoor_input_values when "0001",
-                   backdoor_input_values when "0010",
-                   backdoor_input_values when "0011",
-                   WD(15 downto 0) when others;
-
-    with sig_toggle_input select
-    WE_temp <=     '1' when "0000",
-                   '1' when "0001",
-                   '1' when "0010",
-                   '1' when "0011",
-                  WE when others;
-        
-    process(clk, backdoor_input_button)
+    process(clk)
     begin
-    if(backdoor_input_button'event and backdoor_input_button = '1') then
-        if (sig_toggle_input = "0000") then
-            sig_toggle_input <= "0001";
-        elsif (sig_toggle_input = "0001") then
-            sig_toggle_input <= "0010";
-        elsif (sig_toggle_input = "0010") then
-            sig_toggle_input <= "0011";
-        elsif (sig_toggle_input = "0011") then
-            sig_toggle_input <= "1111";
-        else sig_toggle_input <= "1111";
+        if (rising_edge(clk) AND WE = '1') then    
+            RAM(to_integer(unsigned(A(9 downto 0)))) <= WD(15 downto 0);
         end if;
-        
-    end if;
-    if (rising_edge(clk) AND WE_temp = '1') then    
-                RAM(to_integer(unsigned(a_temp(9 downto 0)))) <= WD_temp(15 downto 0);
-            end if;
     end process;
     
     sig_input <= RAM(to_integer(unsigned(A(9 downto 0))));
