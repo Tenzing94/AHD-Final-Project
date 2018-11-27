@@ -40,7 +40,8 @@ entity top_module is
            bit_flags : out STD_LOGIC_VECTOR (8 downto 0); -- LED output
            hal : out STD_LOGIC;
            backdoor_input_button : in STD_LOGIC;
-           backdoor_input_values : in STD_LOGIC_VECTOR (15 downto 0)
+           backdoor_input_values : in STD_LOGIC_VECTOR (15 downto 0);
+           debug : out std_logic_vector(2 downto 0)
           );
 end top_module;
 
@@ -108,9 +109,7 @@ end component;
      Port ( 
          CLK, WE : in std_logic;
          A, WD   : in std_logic_vector(31 downto 0);
-         RD      : out std_logic_vector(31 downto 0);
-         backdoor_input_button : in STD_LOGIC;
-         backdoor_input_values : in STD_LOGIC_VECTOR (15 downto 0)
+         RD      : out std_logic_vector(31 downto 0)
          );
  end component;
  
@@ -208,6 +207,14 @@ constant two : std_logic_vector( 4 downto 0 ) := "00010";
 constant four : std_logic_vector( 31 downto 0 ) := X"00000004";
 constant one : std_logic_vector( 31 downto 0 ) := X"00000001";
 
+-- Backdoor
+
+signal a_temp : std_logic_vector(31 downto 0);
+signal WD_temp : std_logic_vector(31 downto 0);
+signal WE_temp : std_logic := '0';
+signal clk_temp : std_logic:= backdoor_input_button;
+signal sig_toggle_input : std_logic_vector(3 downto 0) := "0000";
+
 begin
 
 -- Define control Reg
@@ -233,6 +240,43 @@ with currentInst( 31 downto 26 ) select
     RF2 <= "00010" when "111111",
             instRF2 when others; 
 
+-- Backdoor to dmem
+ with sig_toggle_input select
+       a_temp <= x"00000034" when "0000",
+                 x"00000035" when "0001",
+                 x"00000036" when "0010",
+                 x"00000037" when "0011",
+                 ALUResult when others;
+            
+   with sig_toggle_input select
+       WD_temp <= X"0000" & backdoor_input_values when "0000",
+                  X"0000" & backdoor_input_values when "0001",
+                  X"0000" & backdoor_input_values when "0010",
+                  X"0000" & backdoor_input_values when "0011",
+                  register2 when others;
+
+   with sig_toggle_input select
+       WE_temp <=     '1' when "0000",
+                      '1' when "0001",
+                      '1' when "0010",
+                      '1' when "0011",
+                      cMemWrite when others;
+                      
+debug <=    sig_toggle_input(2 downto 0);              
+     process( backdoor_input_button)
+     begin
+         if(backdoor_input_button'event and backdoor_input_button = '1') then
+             if (sig_toggle_input = "0000") then
+                 sig_toggle_input <= "0001";
+             elsif (sig_toggle_input = "0001") then
+                 sig_toggle_input <= "0010";
+             elsif (sig_toggle_input = "0010") then
+                 sig_toggle_input <= "0011";
+             elsif (sig_toggle_input = "0011") then
+                 sig_toggle_input <= "1111";
+             end if;
+         end if;
+    end process;
 -- Main Components
 
 pc1: pc PORT MAP(in_pc => demux_pc, clr => rst, clk => clk, out_pc => progCounter );
@@ -240,7 +284,7 @@ imem0: imem PORT MAP( in_pc => progCounter, out_imem => currentInst);
 rf0: rf PORT Map ( clk => clk, WE3 => cRegWrite, A1 => RF1, A2 => RF2, A3 => currentInst_A3 , WD3 => result , RD1 => sourceA, RD2 => register2 );
 alu0: ALU_FPGA PORT MAP( SrcA => sourceA, SrcB => sourceB, ALU_Control => cALUOpcode, ALU_Result => ALUResult, Flag_Zero => zero, Flag_Negative => negative );
 cu0: control_unit PORT MAP( opcode => currentInst( 31 downto 26), funct => currentInst( 5 downto 0), controlReg => tempCoontrolReg );
-dmem0: dmem PORT MAP ( clk => clk, WE => cMemWrite, A => ALUResult, WD => register2, RD => memReadData, backdoor_input_button => backdoor_input_button, backdoor_input_values => backdoor_input_values);
+dmem0: dmem PORT MAP ( clk => clk, WE => WE_temp, A => a_temp, WD => WD_temp, RD => memReadData);
 
 
 -- MUX and other components
