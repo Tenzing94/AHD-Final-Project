@@ -247,10 +247,7 @@ with currentInst( 31 downto 26 ) select
             instRF2 when others; 
 
 -- Backdoor to dmem
-<<<<<<< HEAD
 
-=======
->>>>>>> 96e9513efd57d629cc4ea9d3d195706ccc8db70e
  with sig_toggle_input select
        a_temp <= x"00000034" when "000",
                  x"00000034" when "001",
@@ -260,12 +257,8 @@ with currentInst( 31 downto 26 ) select
                  x"00000036" when "101",
                  x"00000037" when "110",
                  x"00000037" when "111",
-<<<<<<< HEAD
-                 X"11111111" when others;
-=======
                  x"11111111" when others;
               
->>>>>>> 96e9513efd57d629cc4ea9d3d195706ccc8db70e
             
 with sig_toggle_input select
    WD_temp <= X"0000" & backdoor_input_values_temp when "001",
@@ -285,14 +278,9 @@ with sig_toggle_input select
                   '0' when "110",
                   '1' when "111",
                   '0' when others;
-<<<<<<< HEAD
                   
 -- Saves the previous 8-bit input values because dmem is 16 bits
-=======
-                 
-                  
 
->>>>>>> 96e9513efd57d629cc4ea9d3d195706ccc8db70e
 with sig_toggle_input select
     backdoor_input_values_prev <=  backdoor_input_values when "000",
                                    backdoor_input_values when "010",
@@ -303,11 +291,7 @@ with sig_toggle_input select
 
 backdoor_input_values_temp <= backdoor_input_values_prev & backdoor_input_values;
 
-<<<<<<< HEAD
 -- Select if input mode or normal processor flow mode
-=======
--- Select if input mode or normal processor flow
->>>>>>> 96e9513efd57d629cc4ea9d3d195706ccc8db70e
 
 with switch_1 select
     WD <= WD_temp when '0',
@@ -332,8 +316,6 @@ debug <= sig_toggle_input(2 downto 0);
  process( backdoor_input_button)
  begin
      if(backdoor_input_button'event and backdoor_input_button = '1') then
-<<<<<<< HEAD
-=======
 --         if (sig_toggle_input = "0000") then
 --             sig_toggle_input <= "0001";
 --         elsif (sig_toggle_input = "0001") then
@@ -366,7 +348,6 @@ debug <= sig_toggle_input(2 downto 0);
 --              sig_toggle_input <= "1111";
 --         elsif (sig_toggle_input = "1111") then
 --              sig_toggle_input <= "0000";
->>>>>>> 96e9513efd57d629cc4ea9d3d195706ccc8db70e
         if (sig_toggle_input = "000") then
             sig_toggle_input <= "001";
         elsif (sig_toggle_input = "001") then
@@ -386,10 +367,7 @@ debug <= sig_toggle_input(2 downto 0);
          end if;
      end if;
 end process;
-<<<<<<< HEAD
 
-=======
->>>>>>> 96e9513efd57d629cc4ea9d3d195706ccc8db70e
 -- Main Components
 
 pc1: pc PORT MAP(in_pc => demux_pc, clr => rst, clk => clk, out_pc => progCounter );
