@@ -63,16 +63,30 @@ component clk_slow is
     );
 end component;
 
+--component top_module is
+--    Port ( clk       : in STD_LOGIC;
+--           rst       : in STD_LOGIC;
+--           outputA   : out STD_LOGIC_VECTOR (31 downto 0);
+--           outputB   : out STD_LOGIC_VECTOR (31 downto 0);
+--           bit_flags : out STD_LOGIC_VECTOR (8 downto 0); -- LED output
+--           hal       : out STD_LOGIC;
+--           backdoor_input_button : in STD_LOGIC;
+--           backdoor_input_values : in STD_LOGIC_VECTOR (15 downto 0);
+--           debug: out std_logic_vector(2 downto 0)
+--          );
+--end component;
+
 component top_module is
-    Port ( clk       : in STD_LOGIC;
-           rst       : in STD_LOGIC;
-           outputA   : out STD_LOGIC_VECTOR (31 downto 0);
-           outputB   : out STD_LOGIC_VECTOR (31 downto 0);
+    Port ( clk : in STD_LOGIC;
+           rst : in STD_LOGIC;
+           outputA : out STD_LOGIC_VECTOR (31 downto 0);
+           outputB : out STD_LOGIC_VECTOR (31 downto 0);
            bit_flags : out STD_LOGIC_VECTOR (8 downto 0); -- LED output
-           hal       : out STD_LOGIC;
+           hal : out STD_LOGIC;
            backdoor_input_button : in STD_LOGIC;
-           backdoor_input_values : in STD_LOGIC_VECTOR (15 downto 0);
-           debug: out std_logic_vector(2 downto 0)
+           backdoor_input_values : in STD_LOGIC_VECTOR (7 downto 0);
+           switch_1 : in STD_LOGIC;
+           debug : out std_logic_vector(2 downto 0)
           );
 end component;
 
@@ -117,7 +131,7 @@ DBBTNC  : debouncer PORT MAP (clk => sig_clk_100Mhz, button_in => sig_BTNC, puls
 DBBTND  : debouncer PORT MAP (clk => sig_clk_100Mhz, button_in => sig_BTND, pulse_out => sig_clock_select);
 DBBTNL  : debouncer PORT MAP (clk => sig_clk_100Mhz, button_in => sig_BTNL, pulse_out => sig_input_button);
 CLKSLOW : clk_slow PORT MAP (clk_in => sig_clk_100Mhz, clk_out => sig_clk_slow);
-TOP     : top_module PORT MAP (clk => sig_clock_in, rst => BTNU,outputA => sig_outputA, outputB => sig_outputB, bit_flags => sig_bit_flags, hal =>  hal, backdoor_input_button => sig_input_button, backdoor_input_values => SW, debug => debug);
+TOP     : top_module PORT MAP (clk => sig_clock_in, rst => BTNU,outputA => sig_outputA, outputB => sig_outputB, bit_flags => sig_bit_flags, hal =>  hal, backdoor_input_button => SW(0), backdoor_input_values => SW(15 downto 8), switch_1 => SW(1), debug => debug);
 --TOP     : top_module PORT MAP (clk => sig_clock_in, rst => BTNU,outputA => sig_outputA, outputB => sig_outputB, bit_flags => sig_bit_flags, hal =>  hal, backdoor_input_button => BTNL, backdoor_input_values => SW,  debug => debug);
 CLKSSD  : clk_for_ssd PORT MAP (clk_in => sig_clk_100Mhz, clk_out => sig_clk_for_ssd);
 SSD     : seven_seg PORT MAP (clk_for_ssd => sig_clk_for_ssd, ss_input => sig_output, Cathode_Pattern => sig_cathode, AN_Activate => sig_anode);
