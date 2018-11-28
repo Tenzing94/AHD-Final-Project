@@ -19,8 +19,10 @@ component top_module is
        outputB : out STD_LOGIC_VECTOR (31 downto 0);
        bit_flags : out STD_LOGIC_VECTOR (8 downto 0); -- LED output
        hal : out STD_LOGIC;
-       backdoor_input_button : in STD_LOGIC;
-       backdoor_input_values : in STD_LOGIC_VECTOR (15 downto 0)
+       backdoor_input_button : in STD_LOGIC; -- SW(0)
+       backdoor_input_values : in STD_LOGIC_VECTOR (7 downto 0); -- (SW(15):SW(9))
+       switch_1 : in std_logic; -- SW(1)
+       debug : out std_logic_vector(2 downto 0)
       );
 end component;
 
@@ -32,7 +34,9 @@ end component;
     signal tHal : std_logic; -- HALT signal
     -- dmem signals
     signal tBackdoorInput : std_logic;
-    signal tBackdoorInputVals : std_logic_vector(15 downto 0);
+    signal tBackdoorInputVals : std_logic_vector(7 downto 0);
+    signal tSwitch1 : std_logic;
+    signal tDebug : std_logic_vector(2 downto 0);
     
     -- clock-specific signals
     signal tClk : std_logic := '0'; -- init. the clock (required!)
@@ -50,7 +54,9 @@ begin
             bit_flags => tBit_Flags,
             hal => tHal,
             backdoor_input_button => tBackdoorInput,
-            backdoor_input_values => tBackdoorInputVals);
+            backdoor_input_values => tBackdoorInputVals,
+            switch_1 => tSwitch1,
+            debug => tDebug);
    
    -- Clock process (how the clock should behave)
     clk_process : process
@@ -68,50 +74,52 @@ begin
        -- hold reset state high for 100ns
        tRst <= '1';
        wait for clk_period;
-       
        -- reset is off
        tRst <= '0';
        
+       -- Enter Input Mode
+       tSwitch1 <= '0';
        
        --// Register A //-- 
-       -- button depressed
-       tBackdoorInput <= '0';
+       -- select A(1)
        wait for clk_period/2;
-       -- input val - 16b of A
-       tBackdoorInputVals <= "0000000000000000";
-      -- press button
+       tDebug <= "000";
+       tBackdoorInputVals <= "00000000";
        tBackdoorInput <= '1';
        wait for clk_period/2;
-       
-       -- button depressed
        tBackdoorInput <= '0';
+       
        wait for clk_period/2;
-       -- input val - 16b of A
-       tBackdoorInputVals <= "0000000000000000";
-      -- press button
+       -- select A(2)
+       tDebug <= "001";
+       tBackdoorInputVals <= "00000001";
        tBackdoorInput <= '1';
        wait for clk_period/2;
-       
-       -- // Reigster B // --
-      -- button depressed
        tBackdoorInput <= '0';
+
+       
+       --// Register B //-- 
        wait for clk_period/2;
-       -- input val - 16b of A
-       tBackdoorInputVals <= "0000000000000000";
-      -- press button
+       -- select B(1)
+       tDebug <= "010";
+       tBackdoorInputVals <= "00000010";
        tBackdoorInput <= '1';
        wait for clk_period/2;
-       
-      -- button depressed
        tBackdoorInput <= '0';
+       
        wait for clk_period/2;
-       -- input val - 16b of A
-       tBackdoorInputVals <= "0000000000000000";
-      -- press button
+       -- select B(2)
+       tDebug <= "011";
+       tBackdoorInputVals <= "00000011";
        tBackdoorInput <= '1';
        wait for clk_period/2;
+       tBackdoorInput <= '0';
+
+       -- Enter Execution Mode
+       tSwitch1 <= '1';
+       tDebug <= "000";
+       tBackdoorInputVals <= "00000000";    
        
-      tBackdoorInput <= '0';
        wait for cycle_time;
     end process;
 end testbench;
