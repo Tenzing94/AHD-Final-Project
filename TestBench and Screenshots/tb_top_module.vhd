@@ -73,6 +73,8 @@ begin
        -- reset the CPU     
        -- hold reset state high for 100ns
        tRst <= '1';
+       tBackdoorInputVals <= "00000000";
+       tBackdoorInput <= '0';
        wait for clk_period;
        -- reset is off
        tRst <= '0';
