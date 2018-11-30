@@ -41,8 +41,9 @@ entity top_module is
            hal : out STD_LOGIC;
            backdoor_input_button : in STD_LOGIC;
            backdoor_input_values : in STD_LOGIC_VECTOR (7 downto 0);
-           switch_1 : in STD_LOGIC;
-           debug : out std_logic_vector(2 downto 0)
+           mode : in STD_LOGIC_VECTOR(1 downto 0);
+           input_or_process: in STD_LOGIC;
+           debug : out std_logic_vector(3 downto 0)
           );
 end top_module;
 
@@ -211,13 +212,15 @@ constant one : std_logic_vector( 31 downto 0 ) := X"00000001";
 -- Backdoor
 
 signal a_temp : std_logic_vector(31 downto 0);
+signal a_temp_64_bits : std_logic_vector(31 downto 0);
+signal a_temp_128_bits : std_logic_vector(31 downto 0);
 signal a : std_logic_vector(31 downto 0);
 signal WD_temp : std_logic_vector(31 downto 0);
 signal WD : std_logic_vector(31 downto 0);
 signal WE_temp : std_logic := '0';
 signal WE : std_logic := '0';
 signal clk1 : std_logic;
-signal sig_toggle_input : std_logic_vector(2 downto 0) := "000";
+signal sig_toggle_input : std_logic_vector(3 downto 0) := "0000";
 signal backdoor_input_values_temp : STD_LOGIC_VECTOR (15 downto 0);
 signal backdoor_input_values_prev : STD_LOGIC_VECTOR (7 downto 0);
 
@@ -248,44 +251,90 @@ with currentInst( 31 downto 26 ) select
 
 -- Backdoor to dmem
 
+-- Encrypt and decrypt setup
+
  with sig_toggle_input select
-       a_temp <= x"00000034" when "000",
-                 x"00000034" when "001",
-                 x"00000035" when "010",
-                 x"00000035" when "011",
-                 x"00000036" when "100",
-                 x"00000036" when "101",
-                 x"00000037" when "110",
-                 x"00000037" when "111",
-                 x"11111111" when others;
+       a_temp_64_bits <= x"00000034" when "0000",
+                         x"00000034" when "0001",
+                         x"00000035" when "0010",
+                         x"00000035" when "0011",
+                         x"00000036" when "0100",
+                         x"00000036" when "0101",
+                         x"00000037" when "0110",
+                         x"00000037" when "0111",
+                         x"11111111" when others;
               
+ -- Round Key Input
+ 
+   with sig_toggle_input select
+       a_temp_128_bits <= x"00000046" when "0000",
+                          x"00000046" when "0001",
+                          x"00000047" when "0010",
+                          x"00000047" when "0011",
+                          x"00000044" when "0100",
+                          x"00000044" when "0101",
+                          x"00000045" when "0110",
+                          x"00000045" when "0111",
+                          x"00000042" when "1000",
+                          x"00000042" when "1001",
+                          x"00000043" when "1010",
+                          x"00000043" when "1011",
+                          x"00000040" when "1100",
+                          x"00000040" when "1101",
+                          x"00000041" when "1110",
+                          x"00000041" when "1111",
+                          x"11111111" when others; 
+ 
+ -- Combine both
+            
+with mode select
+    a_temp <= a_temp_128_bits when "00",
+              a_temp_64_bits when others;
+            
+            
             
 with sig_toggle_input select
-   WD_temp <= X"0000" & backdoor_input_values_temp when "001",
-              X"0000" & backdoor_input_values_temp when "011",
-              X"0000" & backdoor_input_values_temp when "101",
-              X"0000" & backdoor_input_values_temp when "111",
+   WD_temp <= X"0000" & backdoor_input_values_temp when "0001",
+              X"0000" & backdoor_input_values_temp when "0011",
+              X"0000" & backdoor_input_values_temp when "0101",
+              X"0000" & backdoor_input_values_temp when "0111",
+              X"0000" & backdoor_input_values_temp when "1001",
+              X"0000" & backdoor_input_values_temp when "1011",
+              X"0000" & backdoor_input_values_temp when "1101",
+              X"0000" & backdoor_input_values_temp when "1111",
               X"00000000" when others;
 
 
 with sig_toggle_input select
-   WE_temp <=     '0' when "000",
-                  '1' when "001",
-                  '0' when "010",
-                  '1' when "011",
-                  '0' when "100",
-                  '1' when "101",
-                  '0' when "110",
-                  '1' when "111",
+   WE_temp <=     '0' when "0000",
+                  '1' when "0001",
+                  '0' when "0010",
+                  '1' when "0011",
+                  '0' when "0100",
+                  '1' when "0101",
+                  '0' when "0110",
+                  '1' when "0111",
+                  '0' when "1000",
+                  '1' when "1001",
+                  '0' when "1010",
+                  '1' when "1011",
+                  '0' when "1100",
+                  '1' when "1101",
+                  '0' when "1110",
+                  '1' when "1111",
                   '0' when others;
                   
 -- Saves the previous 8-bit input values because dmem is 16 bits
 
 with sig_toggle_input select
-    backdoor_input_values_prev <=  backdoor_input_values when "000",
-                                   backdoor_input_values when "010",
-                                   backdoor_input_values when "100",
-                                   backdoor_input_values when "110",
+    backdoor_input_values_prev <=  backdoor_input_values when "0000",
+                                   backdoor_input_values when "0010",
+                                   backdoor_input_values when "0100",
+                                   backdoor_input_values when "0110",
+                                   backdoor_input_values when "1000",
+                                   backdoor_input_values when "1010",
+                                   backdoor_input_values when "1100",
+                                   backdoor_input_values when "1110",
                                    backdoor_input_values_prev when others;
                   
 
@@ -293,79 +342,90 @@ backdoor_input_values_temp <= backdoor_input_values_prev & backdoor_input_values
 
 -- Select if input mode or normal processor flow mode
 
-with switch_1 select
+with input_or_process select
     WD <= WD_temp when '0',
           register2 when others;
           
-with switch_1 select
+with input_or_process select
       WE <= WE_temp when '0',
             cMemWrite when others;
 
-with switch_1 select
+with input_or_process select
     a <= a_temp when '0',
          ALUResult when others;
          
-with switch_1 select
+with input_or_process select
      clk1 <=  backdoor_input_button when '0',
               clk when others;
 
 -- finish mode select
                       
-debug <= sig_toggle_input(2 downto 0); 
+debug <= sig_toggle_input; 
              
- process( backdoor_input_button)
+ process( backdoor_input_button, rst)
  begin
-     if(backdoor_input_button'event and backdoor_input_button = '1') then
---         if (sig_toggle_input = "0000") then
---             sig_toggle_input <= "0001";
---         elsif (sig_toggle_input = "0001") then
---             sig_toggle_input <= "0010";
---         elsif (sig_toggle_input = "0010") then
---             sig_toggle_input <= "0011";
---         elsif (sig_toggle_input = "0011") then
---             sig_toggle_input <= "0100";
---         elsif (sig_toggle_input = "0100") then
---             sig_toggle_input <= "0101";
---         elsif (sig_toggle_input = "0101") then
---             sig_toggle_input <= "0110";
---         elsif (sig_toggle_input = "0110") then
---             sig_toggle_input <= "0111";
---         elsif (sig_toggle_input = "0111") then
---             sig_toggle_input <= "1000";
---         elsif (sig_toggle_input = "1000") then
---             sig_toggle_input <= "1001";
---         elsif (sig_toggle_input = "1001") then
---             sig_toggle_input <= "1010";
---         elsif (sig_toggle_input = "1010") then
---             sig_toggle_input <= "1011";
---         elsif (sig_toggle_input = "1011") then
---             sig_toggle_input <= "1100";
---         elsif (sig_toggle_input = "1100") then
---             sig_toggle_input <= "1101";
---         elsif (sig_toggle_input = "1101") then
---              sig_toggle_input <= "1110";
---         elsif (sig_toggle_input = "1110") then
---              sig_toggle_input <= "1111";
---         elsif (sig_toggle_input = "1111") then
---              sig_toggle_input <= "0000";
-        if (sig_toggle_input = "000") then
-            sig_toggle_input <= "001";
-        elsif (sig_toggle_input = "001") then
-            sig_toggle_input <= "010";
-        elsif (sig_toggle_input = "010") then
-            sig_toggle_input <= "011";
-        elsif (sig_toggle_input = "011") then
-            sig_toggle_input <= "100";
-        elsif (sig_toggle_input = "100") then
-            sig_toggle_input <= "101";
-        elsif (sig_toggle_input = "101") then
-            sig_toggle_input <= "110";
-        elsif (sig_toggle_input = "110") then
-            sig_toggle_input <= "111";
-        elsif (sig_toggle_input = "111") then
-            sig_toggle_input <= "000";
+    
+     if(rst = '1') then
+        sig_toggle_input <= "0000";     
+     elsif(backdoor_input_button'event and backdoor_input_button = '1') then
+     -- Counter for  Round Key Input 
+        if(mode = "00") then
+             if (sig_toggle_input = "0000") then
+                 sig_toggle_input <= "0001";
+             elsif (sig_toggle_input = "0001") then
+                 sig_toggle_input <= "0010";
+             elsif (sig_toggle_input = "0010") then
+                 sig_toggle_input <= "0011";
+             elsif (sig_toggle_input = "0011") then
+                 sig_toggle_input <= "0100";
+             elsif (sig_toggle_input = "0100") then
+                 sig_toggle_input <= "0101";
+             elsif (sig_toggle_input = "0101") then
+                 sig_toggle_input <= "0110";
+             elsif (sig_toggle_input = "0110") then
+                 sig_toggle_input <= "0111";
+             elsif (sig_toggle_input = "0111") then
+                 sig_toggle_input <= "1000";
+             elsif (sig_toggle_input = "1000") then
+                 sig_toggle_input <= "1001";
+             elsif (sig_toggle_input = "1001") then
+                 sig_toggle_input <= "1010";
+             elsif (sig_toggle_input = "1010") then
+                 sig_toggle_input <= "1011";
+             elsif (sig_toggle_input = "1011") then
+                 sig_toggle_input <= "1100";
+             elsif (sig_toggle_input = "1100") then
+                 sig_toggle_input <= "1101";
+             elsif (sig_toggle_input = "1101") then
+                  sig_toggle_input <= "1110";
+             elsif (sig_toggle_input = "1110") then
+                  sig_toggle_input <= "1111";
+             elsif (sig_toggle_input = "1111") then
+                  sig_toggle_input <= "0000";
+          end if;
+
+    --Counter value for Encrypt and Decrypt
+        elsif(mode = "10" or mode = "01") then
+            if (sig_toggle_input = "0000") then
+                sig_toggle_input <= "0001";
+            elsif (sig_toggle_input = "0001") then
+                sig_toggle_input <= "0010";
+            elsif (sig_toggle_input = "0010") then
+                sig_toggle_input <= "0011";
+            elsif (sig_toggle_input = "0011") then
+                sig_toggle_input <= "0100";
+            elsif (sig_toggle_input = "0100") then
+                sig_toggle_input <= "0101";
+            elsif (sig_toggle_input = "0101") then
+                sig_toggle_input <= "0110";
+            elsif (sig_toggle_input = "0110") then
+                sig_toggle_input <= "0111";
+            elsif (sig_toggle_input = "0111") then
+                sig_toggle_input <= "0000";
+             end if;
          end if;
      end if;
+     
 end process;
 
 -- Main Components
