@@ -63,19 +63,6 @@ component clk_slow is
     );
 end component;
 
---component top_module is
---    Port ( clk       : in STD_LOGIC;
---           rst       : in STD_LOGIC;
---           outputA   : out STD_LOGIC_VECTOR (31 downto 0);
---           outputB   : out STD_LOGIC_VECTOR (31 downto 0);
---           bit_flags : out STD_LOGIC_VECTOR (8 downto 0); -- LED output
---           hal       : out STD_LOGIC;
---           backdoor_input_button : in STD_LOGIC;
---           backdoor_input_values : in STD_LOGIC_VECTOR (15 downto 0);
---           debug: out std_logic_vector(2 downto 0)
---          );
---end component;
-
 component top_module is
     Port ( clk : in STD_LOGIC;
            rst : in STD_LOGIC;
@@ -85,10 +72,25 @@ component top_module is
            hal : out STD_LOGIC;
            backdoor_input_button : in STD_LOGIC;
            backdoor_input_values : in STD_LOGIC_VECTOR (7 downto 0);
-           switch_1 : in STD_LOGIC;
-           debug : out std_logic_vector(2 downto 0)
+           mode : in STD_LOGIC_VECTOR(1 downto 0);
+           input_or_process: in STD_LOGIC;
+           debug : out std_logic_vector(3 downto 0)
           );
 end component;
+
+--component top_module is
+--    Port ( clk : in STD_LOGIC;
+--           rst : in STD_LOGIC;
+--           outputA : out STD_LOGIC_VECTOR (31 downto 0);
+--           outputB : out STD_LOGIC_VECTOR (31 downto 0);
+--           bit_flags : out STD_LOGIC_VECTOR (8 downto 0); -- LED output
+--           hal : out STD_LOGIC;
+--           backdoor_input_button : in STD_LOGIC;
+--           backdoor_input_values : in STD_LOGIC_VECTOR (7 downto 0);
+--           switch_1 : in STD_LOGIC;
+--           debug : out std_logic_vector(2 downto 0)
+--          );
+--end component;
 
 component clk_for_ssd is
     Port (
@@ -112,7 +114,7 @@ signal sig_clk_100Mhz, sig_clk_slow, sig_clk_for_ssd : std_logic;
 signal sig_BTNC, sig_BTND, sig_BTNL : std_logic;
 signal sig_SW_clk : std_logic;
 signal sig_clock_button, sig_clock_select, sig_input_button : std_logic;
-signal sig_outputA, sig_outputB, sig_output : std_logic_vector(31 downto 0);
+signal sig_outputA,sig_outputA_temp, sig_outputB_temp , sig_outputB, sig_output, input_displayA,input_displayB  : std_logic_vector(31 downto 0);
 signal sig_bit_flags : std_logic_vector(8 downto 0);
 signal sig_cathode : std_logic_vector(6 downto 0);
 signal sig_anode : std_logic_vector(7 downto 0);
@@ -122,7 +124,7 @@ signal sig_clock_in : std_logic := '0';
 signal sig_toggle_clk : std_logic := '0'; -- toggle between internal slow clock and clock button
 
 signal SW_temp : std_logic_vector(15 downto 0) := x"0000";
-signal debug: std_logic_vector(2 downto 0);
+signal debug: std_logic_vector(3 downto 0);
 
 begin
 
@@ -131,8 +133,7 @@ DBBTNC  : debouncer PORT MAP (clk => sig_clk_100Mhz, button_in => sig_BTNC, puls
 DBBTND  : debouncer PORT MAP (clk => sig_clk_100Mhz, button_in => sig_BTND, pulse_out => sig_clock_select);
 DBBTNL  : debouncer PORT MAP (clk => sig_clk_100Mhz, button_in => sig_BTNL, pulse_out => sig_input_button);
 CLKSLOW : clk_slow PORT MAP (clk_in => sig_clk_100Mhz, clk_out => sig_clk_slow);
-TOP     : top_module PORT MAP (clk => sig_clock_in, rst => BTNU,outputA => sig_outputA, outputB => sig_outputB, bit_flags => sig_bit_flags, hal =>  hal, backdoor_input_button => SW(0), backdoor_input_values => SW(15 downto 8), switch_1 => SW(1), debug => debug);
---TOP     : top_module PORT MAP (clk => sig_clock_in, rst => BTNU,outputA => sig_outputA, outputB => sig_outputB, bit_flags => sig_bit_flags, hal =>  hal, backdoor_input_button => BTNL, backdoor_input_values => SW,  debug => debug);
+TOP     : top_module PORT MAP (clk => sig_clock_in, rst => BTNU,outputA => sig_outputA, outputB => sig_outputB, bit_flags => sig_bit_flags, hal =>  hal, backdoor_input_button => SW(0), backdoor_input_values => SW(15 downto 8), input_or_process => SW(3), mode => SW(2 downto 1), debug => debug);
 CLKSSD  : clk_for_ssd PORT MAP (clk_in => sig_clk_100Mhz, clk_out => sig_clk_for_ssd);
 SSD     : seven_seg PORT MAP (clk_for_ssd => sig_clk_for_ssd, ss_input => sig_output, Cathode_Pattern => sig_cathode, AN_Activate => sig_anode);
 
@@ -151,7 +152,7 @@ with hal select
 
 LED(9) <= sig_input_button;
 LED(10) <= BTNU;
-LED(13 downto 11) <= debug;
+LED(14 downto 11) <= debug;
 
 process(sig_clock_select)
 begin
@@ -169,8 +170,16 @@ with sig_toggle_clk select
      sig_clock_in  <= sig_clk_slow when '1',
                       sig_clock_button when others;
 
+with SW(3) select
+    input_displayA <= sig_outputA when '1',
+                      x"000000" & SW(15 downto 8) when others;
+
+with SW(3) select
+    input_displayB <= sig_outputB when '1',
+                      x"00000000" when others;
+
 with BTNR select
-    sig_output <= sig_outputA when '0',
-                  sig_outputB when '1';
+    sig_output <= input_displayA when '0',
+                  input_displayB when '1';
 
 end Behavioral;
