@@ -38,11 +38,11 @@ entity top_module is
            outputA : out STD_LOGIC_VECTOR (31 downto 0);
            outputB : out STD_LOGIC_VECTOR (31 downto 0);
            bit_flags : out STD_LOGIC_VECTOR (8 downto 0); -- LED output
-           hal : out STD_LOGIC;
-           backdoor_input_button : in STD_LOGIC;
-           backdoor_input_values : in STD_LOGIC_VECTOR (7 downto 0);
-           mode : in STD_LOGIC_VECTOR(1 downto 0);
-           input_or_process: in STD_LOGIC;
+           hal : out STD_LOGIC; -- halt signal
+           backdoor_input_button : in STD_LOGIC; -- push to backdoor
+           backdoor_input_values : in STD_LOGIC_VECTOR (7 downto 0); -- board inputs
+           mode : in STD_LOGIC_VECTOR(1 downto 0); -- encryption, decryption, keygeneration
+           input_or_process: in STD_LOGIC; -- input or execution, mode selection
            debug : out std_logic_vector(3 downto 0)
           );
 end top_module;
