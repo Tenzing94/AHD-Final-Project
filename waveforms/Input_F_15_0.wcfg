@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wave_config>
+   <wave_state>
+   </wave_state>
+   <db_ref_list>
+      <db_ref path="top_module_behav.wdb" id="1">
+         <top_modules>
+            <top_module name="top_module" />
+         </top_modules>
+      </db_ref>
+   </db_ref_list>
+   <zoom_setting>
+      <ZoomStartTime time="536119200000fs"></ZoomStartTime>
+      <ZoomEndTime time="536200400001fs"></ZoomEndTime>
+      <Cursor1Time time="536178600000fs"></Cursor1Time>
+   </zoom_setting>
+   <column_width_setting>
+      <NameColumnWidth column_width="152"></NameColumnWidth>
+      <ValueColumnWidth column_width="80"></ValueColumnWidth>
+   </column_width_setting>
+   <WVObjectSize size="41" />
+   <wvobject fp_name="/top_module/clk" type="logic">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_module/rst" type="logic">
+      <obj_property name="ElementShortName">rst</obj_property>
+      <obj_property name="ObjectShortName">rst</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_module/outputA" type="array">
+      <obj_property name="ElementShortName">outputA[31:0]</obj_property>
+      <obj_property name="ObjectShortName">outputA[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_module/outputB" type="array">
+      <obj_property name="ElementShortName">outputB[31:0]</obj_property>
+      <obj_property name="ObjectShortName">outputB[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_module/bit_flags" type="array">
+      <obj_property name="ElementShortName">bit_flags[8:0]</obj_property>
+      <obj_property name="ObjectShortName">bit_flags[8:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_module/hal" type="logic">
+      <obj_property name="ElementShortName">hal</obj_property>
+      <obj_property name="ObjectShortName">hal</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_module/in_pc" type="array">
+      <obj_property name="ElementShortName">in_pc[31:0]</obj_property>
+      <obj_property name="ObjectShortName">in_pc[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_module/demux_pc" type="array">
+      <obj_property name="ElementShortName">demux_pc[31:0]</obj_property>
+      <obj_property name="ObjectShortName">demux_pc[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_module/progCounter" type="array">
+      <obj_property name="ElementShortName">progCounter[31:0]</obj_property>
+      <obj_property name="ObjectShortName">progCounter[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_module/pcPlus4" type="array">
+      <obj_property name="ElementShortName">pcPlus4[31:0]</obj_property>
+      <obj_property name="ObjectShortName">pcPlus4[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_module/pcBranch" type="array">
+      <obj_property name="ElementShortName">pcBranch[31:0]</obj_property>
+      <obj_property name="ObjectShortName">pcBranch[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_module/pcJump" type="array">
+      <obj_property name="ElementShortName">pcJump[31:0]</obj_property>
+      <obj_property name="ObjectShortName">pcJump[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_module/currentInst" type="array">
+      <obj_property name="ElementShortName">currentInst[31:0]</obj_property>
+      <obj_property name="ObjectShortName">currentInst[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_module/instRF1" type="array">
+      <obj_property name="ElementShortName">instRF1[4:0]</obj_property>
+      <obj_property name="ObjectShortName">instRF1[4:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_module/instRF2" type="array">
+      <obj_property name="ElementShortName">instRF2[4:0]</obj_property>
+      <obj_property name="ObjectShortName">instRF2[4:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_module/RF1" type="array">
+      <obj_property name="ElementShortName">RF1[4:0]</obj_property>
+      <obj_property name="ObjectShortName">RF1[4:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_module/RF2" type="array">
+      <obj_property name="ElementShortName">RF2[4:0]</obj_property>
+      <obj_property name="ObjectShortName">RF2[4:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_module/sourceA" type="array">
+      <obj_property name="ElementShortName">sourceA[31:0]</obj_property>
+      <obj_property name="ObjectShortName">sourceA[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_module/register2" type="array">
+      <obj_property name="ElementShortName">register2[31:0]</obj_property>
+      <obj_property name="ObjectShortName">register2[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_module/sourceB" type="array">
+      <obj_property name="ElementShortName">sourceB[31:0]</obj_property>
+      <obj_property name="ObjectShortName">sourceB[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_module/currentInst_A3" type="array">
+      <obj_property name="ElementShortName">currentInst_A3[4:0]</obj_property>
+      <obj_property name="ObjectShortName">currentInst_A3[4:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_module/signImm" type="array">
+      <obj_property name="ElementShortName">signImm[31:0]</obj_property>
+      <obj_property name="ObjectShortName">signImm[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_module/signImmLeftShift" type="array">
+      <obj_property name="ElementShortName">signImmLeftShift[31:0]</obj_property>
+      <obj_property name="ObjectShortName">signImmLeftShift[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_module/ALUResult" type="array">
+      <obj_property name="ElementShortName">ALUResult[31:0]</obj_property>
+      <obj_property name="ObjectShortName">ALUResult[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_module/zero" type="logic">
+      <obj_property name="ElementShortName">zero</obj_property>
+      <obj_property name="ObjectShortName">zero</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_module/negative" type="logic">
+      <obj_property name="ElementShortName">negative</obj_property>
+      <obj_property name="ObjectShortName">negative</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_module/orOp" type="logic">
+      <obj_property name="ElementShortName">orOp</obj_property>
+      <obj_property name="ObjectShortName">orOp</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_module/memReadData" type="array">
+      <obj_property name="ElementShortName">memReadData[31:0]</obj_property>
+      <obj_property name="ObjectShortName">memReadData[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_module/result" type="array">
+      <obj_property name="ElementShortName">result[31:0]</obj_property>
+      <obj_property name="ObjectShortName">result[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_module/cPCsrc" type="logic">
+      <obj_property name="ElementShortName">cPCsrc</obj_property>
+      <obj_property name="ObjectShortName">cPCsrc</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_module/cMemToReg" type="logic">
+      <obj_property name="ElementShortName">cMemToReg</obj_property>
+      <obj_property name="ObjectShortName">cMemToReg</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_module/cMemWrite" type="logic">
+      <obj_property name="ElementShortName">cMemWrite</obj_property>
+      <obj_property name="ObjectShortName">cMemWrite</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_module/cBranch" type="logic">
+      <obj_property name="ElementShortName">cBranch</obj_property>
+      <obj_property name="ObjectShortName">cBranch</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_module/cALUOpcode" type="array">
+      <obj_property name="ElementShortName">cALUOpcode[2:0]</obj_property>
+      <obj_property name="ObjectShortName">cALUOpcode[2:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_module/cALUSrc" type="logic">
+      <obj_property name="ElementShortName">cALUSrc</obj_property>
+      <obj_property name="ObjectShortName">cALUSrc</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_module/cRegDst" type="logic">
+      <obj_property name="ElementShortName">cRegDst</obj_property>
+      <obj_property name="ObjectShortName">cRegDst</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_module/cRegWrite" type="logic">
+      <obj_property name="ElementShortName">cRegWrite</obj_property>
+      <obj_property name="ObjectShortName">cRegWrite</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_module/tempCoontrolReg" type="array">
+      <obj_property name="ElementShortName">tempCoontrolReg[8:0]</obj_property>
+      <obj_property name="ObjectShortName">tempCoontrolReg[8:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_module/two" type="array">
+      <obj_property name="ElementShortName">two[4:0]</obj_property>
+      <obj_property name="ObjectShortName">two[4:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_module/four" type="array">
+      <obj_property name="ElementShortName">four[31:0]</obj_property>
+      <obj_property name="ObjectShortName">four[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/top_module/one" type="array">
+      <obj_property name="ElementShortName">one[31:0]</obj_property>
+      <obj_property name="ObjectShortName">one[31:0]</obj_property>
+   </wvobject>
+</wave_config>
