@@ -36,7 +36,7 @@ entity super_top_module is
            BTNC      : in STD_LOGIC; -- clock button -- DEBOUNCER YES
            BTNU      : in STD_LOGIC; -- reset button -- DEBOUNCER NO
            BTND      : in STD_LOGIC; -- clock select (select between internal slow clock and the clock button) -- DEBOUNCER YES
-           BTNL      : in STD_LOGIC; -- input button (input from the switch goes into the dmem inside top module) -- DEBOUNCER YES
+           -- BTNL      : in STD_LOGIC; -- input button (input from the switch goes into the dmem inside top module) -- DEBOUNCER YES
            BTNR      : in STD_LOGIC; -- display button (if button is pressed, r2 (B value) is shown on sseg. Else r1 (A value) is shown) -- DEBOUNCER NO
            SW        : in std_logic_vector (15 downto 0);
            CA        : out  std_logic_vector (6 downto 0); -- Cathodes
@@ -111,7 +111,8 @@ end component;
 
 ------------------------------ SIGNALS ------------------------------
 signal sig_clk_100Mhz, sig_clk_slow, sig_clk_for_ssd : std_logic;
-signal sig_BTNC, sig_BTND, sig_BTNL : std_logic;
+signal sig_BTNC, sig_BTND : std_logic;
+-- signal sig_BTNL : std_logic;
 signal sig_SW_clk : std_logic;
 signal sig_clock_button, sig_clock_select, sig_input_button : std_logic;
 signal sig_outputA,sig_outputA_temp, sig_outputB_temp , sig_outputB, sig_output, input_displayA,input_displayB  : std_logic_vector(31 downto 0);
@@ -131,7 +132,7 @@ begin
 ------------------------------ PORT MAPS ------------------------------
 DBBTNC  : debouncer PORT MAP (clk => sig_clk_100Mhz, button_in => sig_BTNC, pulse_out => sig_clock_button);
 DBBTND  : debouncer PORT MAP (clk => sig_clk_100Mhz, button_in => sig_BTND, pulse_out => sig_clock_select);
-DBBTNL  : debouncer PORT MAP (clk => sig_clk_100Mhz, button_in => sig_BTNL, pulse_out => sig_input_button);
+--DBBTNL  : debouncer PORT MAP (clk => sig_clk_100Mhz, button_in => sig_BTNL, pulse_out => sig_input_button);
 CLKSLOW : clk_slow PORT MAP (clk_in => sig_clk_100Mhz, clk_out => sig_clk_slow);
 TOP     : top_module PORT MAP (clk => sig_clock_in, rst => BTNU,outputA => sig_outputA, outputB => sig_outputB, bit_flags => sig_bit_flags, hal =>  hal, backdoor_input_button => SW(0), backdoor_input_values => SW(15 downto 8), input_or_process => SW(3), mode => SW(2 downto 1), debug => debug);
 CLKSSD  : clk_for_ssd PORT MAP (clk_in => sig_clk_100Mhz, clk_out => sig_clk_for_ssd);
@@ -141,7 +142,7 @@ SSD     : seven_seg PORT MAP (clk_for_ssd => sig_clk_for_ssd, ss_input => sig_ou
 sig_clk_100Mhz <= CLK100MHZ;
 sig_BTNC <= BTNC;
 sig_BTND <= BTND;
-sig_BTNL <= BTNL;
+--sig_BTNL <= BTNL;
 CA <= sig_cathode;
 AN <= sig_anode;
 LED(8 downto 0) <= sig_bit_flags;
