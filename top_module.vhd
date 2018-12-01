@@ -52,9 +52,10 @@ architecture Behavioral of top_module is
 -- Component PC
 component pc
     Port ( in_pc : in STD_LOGIC_VECTOR (31 downto 0);
-       clr : in STD_LOGIC;
-       clk : in STD_LOGIC;
-       out_pc : out STD_LOGIC_VECTOR (31 downto 0));
+           clr : in STD_LOGIC;
+           clk : in STD_LOGIC;
+           mode : in STD_LOGIC_VECTOR(1 downto 0);
+           out_pc : out STD_LOGIC_VECTOR (31 downto 0));
 end component;
 
 -- Component Imem
@@ -430,7 +431,7 @@ end process;
 
 -- Main Components
 
-pc1: pc PORT MAP(in_pc => demux_pc, clr => rst, clk => clk, out_pc => progCounter );
+pc1: pc PORT MAP(in_pc => demux_pc, clr => rst, clk => clk, out_pc => progCounter, mode => mode );
 imem0: imem PORT MAP( in_pc => progCounter, out_imem => currentInst);
 rf0: rf PORT Map ( clk => clk, WE3 => cRegWrite, A1 => RF1, A2 => RF2, A3 => currentInst_A3 , WD3 => result , RD1 => sourceA, RD2 => register2 );
 alu0: ALU_FPGA PORT MAP( SrcA => sourceA, SrcB => sourceB, ALU_Control => cALUOpcode, ALU_Result => ALUResult, Flag_Zero => zero, Flag_Negative => negative );
