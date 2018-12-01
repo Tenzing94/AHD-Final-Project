@@ -5,16 +5,13 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.numeric_std.all;
--- textio
-USE STD.TEXTIO.ALL;
+use STD.TEXTIO.ALL;
 
-entity tb_top_module is -- empty entity, OK for testbench
+entity tb_top_module is
 end tb_top_module;
-
 
 architecture testbench of tb_top_module is
 
--- top module
 component top_module is
     Port ( clk : in STD_LOGIC;
        rst : in STD_LOGIC;
@@ -24,8 +21,9 @@ component top_module is
        hal : out STD_LOGIC;
        backdoor_input_button : in STD_LOGIC; -- SW(0)
        backdoor_input_values : in STD_LOGIC_VECTOR (7 downto 0); -- (SW(15):SW(9))
-       switch_1 : in std_logic; -- SW(1)
-       debug : out std_logic_vector(2 downto 0)
+       mode: in std_logic_vector(1 downto 0);
+       input_or_process: in STD_LOGIC; -- input or execution, mode selection
+       debug : out std_logic_vector(3 downto 0)
       );
 end component;
 
@@ -38,8 +36,9 @@ end component;
     -- dmem signals
     signal tBackdoorInput : std_logic;
     signal tBackdoorInputVals : std_logic_vector(7 downto 0);
-    signal tSwitch1 : std_logic;
-    signal tDebug : std_logic_vector(2 downto 0);
+    signal tMode : std_logic_vector(1 downto 0);
+    signal tIP : std_logic;
+    signal tDebug : std_logic_vector(3 downto 0);
     
     -- clock-specific signals
     signal tClk : std_logic := '0'; -- init. the clock (required!)
@@ -58,7 +57,8 @@ begin
             hal => tHal,
             backdoor_input_button => tBackdoorInput,
             backdoor_input_values => tBackdoorInputVals,
-            switch_1 => tSwitch1,
+            mode => tMode,
+            input_or_process => tIP,
             debug => tDebug);
    
    -- Clock process (how the clock should behave)
@@ -70,73 +70,53 @@ begin
          wait for clk_period/2;
     end process;
     
-    -- main process
-    file_io:process
-        file in_file : text open read_mode is "din_values.txt";
-        variable in_line : line;
-        -- backdoor dmem input
-        variable text_a1, text_a2, text_b1, text_b2 : std_logic_vector(7 downto 0);
-        begin
-            -- ACTION: Reset the CPU  
-            tRst <= '1';
-            tBackdoorInputVals <= "00000000";
-            tBackdoorInput <= '0';
-            wait for clk_period;
-            -- toggle reset
-            tRst <= '0';
-            while not endfile(in_file) LOOP -- do this til file EOL
-            
- 
-            -- get values from file
-            readline(in_file, in_line); -- get line of input
-            readline(in_line, txt_a1); -- get backdoor value
-            readline(in_line, txt_a2); -- get backdoor value
-            readline(in_line, txt_b1); -- get backdoor value
-            readline(in_line, txt_b2); -- get backdoor value
+    -- Stimulus process (how other parts of the TB should behave
+    stim_proc: process
+    begin   
+       -- reset the CPU     
+       -- hold reset state high for 100ns
+       tRst <= '1';
+       tBackdoorInputVals <= "00000000";
+       tBackdoorInput <= '0';
+       -- Enter Input Mode
+      -- tSwitch1 <= '0';
+
+       -- reset is off
+       tRst <= '0';
 
 
-            --// Register A //-- 
-            -- select A(1)
-            wait for clk_period/2;
-            tDebug <= "000";
-            tBackdoorInputVals <= txt_a1;
-            tBackdoorInput <= '1';
-            wait for clk_period/2;
-            tBackdoorInput <= '0';
-            
-            wait for clk_period/2;
-            -- select A(2)
-            tDebug <= "001";
-            tBackdoorInputVals <= txt_a2;
-            tBackdoorInput <= '1';
-            wait for clk_period/2;
-            tBackdoorInput <= '0';
+       --// Register A //-- 
+       -- select A(1)
+      -- tDebug <= "000";
+       tBackdoorInputVals <= "00000000";
+       tBackdoorInput <= '1';
+       tBackdoorInput <= '0';
+       
+       -- select A(2)
+      -- tDebug <= "001";
+       tBackdoorInputVals <= "00000001";
+       tBackdoorInput <= '1';
+       tBackdoorInput <= '0';
 
-            
-            --// Register B //-- 
-            wait for clk_period/2;
-            -- select B(1)
-            tDebug <= "010";
-            tBackdoorInputVals <= txt_b1;
-            tBackdoorInput <= '1';
-            wait for clk_period/2;
-            tBackdoorInput <= '0';
-            
-            wait for clk_period/2;
-            -- select B(2)
-            tDebug <= "011";
-            tBackdoorInputVals <= txt_b2;
-            tBackdoorInput <= '1';
-            wait for clk_period/2;
-            tBackdoorInput <= '0';
+       
+       --// Register B //-- 
+       -- select B(1)
+      -- tDebug <= "010";
+       tBackdoorInputVals <= "00000010";
+       tBackdoorInput <= '1';
+       tBackdoorInput <= '0';
+       
+       -- select B(2)
+      -- tDebug <= "011";
+       tBackdoorInputVals <= "00000011";
+       tBackdoorInput <= '1';
+       tBackdoorInput <= '0';
 
-            end loop;
-            -- Enter Execution Mode
-            tSwitch1 <= '1';
-            tDebug <= "000";
-            tBackdoorInputVals <= "00000000";   
-
-            assert false report "Simulation complete!" severity note;
-            wait; -- allows the simulation to halt
+       -- Enter Execution Mode
+       --tSwitch1 <= '1';
+       --tDebug <= "000";
+       tBackdoorInputVals <= "00000000";    
+       
+       wait for cycle_time;
     end process;
 end testbench;
