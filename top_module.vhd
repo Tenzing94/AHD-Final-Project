@@ -43,6 +43,7 @@ entity top_module is
            backdoor_input_values : in STD_LOGIC_VECTOR (7 downto 0); -- board inputs
            mode : in STD_LOGIC_VECTOR(1 downto 0); -- encryption, decryption, keygeneration
            input_or_process: in STD_LOGIC; -- input or execution, mode selection
+           pc_output : out STD_LOGIC_VECTOR(31 downto 0);
            debug : out std_logic_vector(3 downto 0)
           );
 end top_module;
@@ -249,6 +250,11 @@ with currentInst( 31 downto 26 ) select
 with currentInst( 31 downto 26 ) select
     RF2 <= "00010" when "111111",
             instRF2 when others; 
+
+-- PC output
+
+pc_output <= progCounter;
+
 
 -- Backdoor to dmem
 

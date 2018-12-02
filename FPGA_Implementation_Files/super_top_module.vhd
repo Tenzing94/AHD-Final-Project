@@ -74,6 +74,7 @@ component top_module is
            backdoor_input_values : in STD_LOGIC_VECTOR (7 downto 0);
            mode : in STD_LOGIC_VECTOR(1 downto 0);
            input_or_process: in STD_LOGIC;
+           pc_output : out STD_LOGIC_VECTOR(31 downto 0);
            debug : out std_logic_vector(3 downto 0)
           );
 end component;
@@ -127,6 +128,8 @@ signal sig_toggle_clk : std_logic := '0'; -- toggle between internal slow clock 
 signal SW_temp : std_logic_vector(15 downto 0) := x"0000";
 signal debug: std_logic_vector(3 downto 0);
 
+signal pc_output,display_A_final, display_B_final : std_logic_vector(31 downto 0);
+
 begin
 
 ------------------------------ PORT MAPS ------------------------------
@@ -134,7 +137,7 @@ DBBTNC  : debouncer PORT MAP (clk => sig_clk_100Mhz, button_in => sig_BTNC, puls
 DBBTND  : debouncer PORT MAP (clk => sig_clk_100Mhz, button_in => sig_BTND, pulse_out => sig_clock_select);
 --DBBTNL  : debouncer PORT MAP (clk => sig_clk_100Mhz, button_in => sig_BTNL, pulse_out => sig_input_button);
 CLKSLOW : clk_slow PORT MAP (clk_in => sig_clk_100Mhz, clk_out => sig_clk_slow);
-TOP     : top_module PORT MAP (clk => sig_clock_in, rst => BTNU,outputA => sig_outputA, outputB => sig_outputB, bit_flags => sig_bit_flags, hal =>  hal, backdoor_input_button => SW(0), backdoor_input_values => SW(15 downto 8), input_or_process => SW(3), mode => SW(2 downto 1), debug => debug);
+TOP     : top_module PORT MAP (clk => sig_clock_in, rst => BTNU,outputA => sig_outputA, outputB => sig_outputB, bit_flags => sig_bit_flags, hal =>  hal, backdoor_input_button => SW(0), backdoor_input_values => SW(15 downto 8), input_or_process => SW(3), mode => SW(2 downto 1), debug => debug, pc_output => pc_output );
 CLKSSD  : clk_for_ssd PORT MAP (clk_in => sig_clk_100Mhz, clk_out => sig_clk_for_ssd);
 SSD     : seven_seg PORT MAP (clk_for_ssd => sig_clk_for_ssd, ss_input => sig_output, Cathode_Pattern => sig_cathode, AN_Activate => sig_anode);
 
@@ -170,7 +173,7 @@ end process;
 with sig_toggle_clk select
      sig_clock_in  <= sig_clk_slow when '1',
                       sig_clock_button when others;
-
+-- Select for input switch values or output assembly values
 with SW(3) select
     input_displayA <= sig_outputA when '1',
                       x"000000" & SW(15 downto 8) when others;
@@ -179,8 +182,17 @@ with SW(3) select
     input_displayB <= sig_outputB when '1',
                       x"00000000" when others;
 
+--Select for PC or output
+with SW(4) select
+    display_A_final <= pc_output when '1',
+                       input_displayA when others;
+                       
+with SW(4) select
+    display_B_final <= pc_output when '1',
+                       input_displayB when others;   
+
 with BTNR select
-    sig_output <= input_displayA when '0',
-                  input_displayB when '1';
+    sig_output <= display_A_final when '0',
+                  display_B_final when '1';
 
 end Behavioral;
