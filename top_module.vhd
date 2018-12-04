@@ -222,6 +222,7 @@ signal WD : std_logic_vector(31 downto 0);
 signal WE_temp : std_logic := '0';
 signal WE : std_logic := '0';
 signal clk1 : std_logic;
+signal clk_curr : std_logic;
 signal sig_toggle_input : std_logic_vector(3 downto 0) := "0000";
 signal backdoor_input_values_temp : STD_LOGIC_VECTOR (15 downto 0);
 signal backdoor_input_values_prev : STD_LOGIC_VECTOR (7 downto 0);
@@ -363,7 +364,11 @@ with input_or_process select
          
 with input_or_process select
      clk1 <=  backdoor_input_button when '0',
-              clk when others;
+              clk when others;                      -- Processor Mode
+
+with input_or_process select
+     clk_curr <=  '0' when '0',
+                  clk when others;                  -- Processor Mode
 
 -- finish mode select
                       
@@ -437,9 +442,9 @@ end process;
 
 -- Main Components
 
-pc1: pc PORT MAP(in_pc => demux_pc, clr => rst, clk => clk, out_pc => progCounter, mode => mode );
+pc1: pc PORT MAP(in_pc => demux_pc, clr => rst, clk => clk_curr, out_pc => progCounter, mode => mode );
 imem0: imem PORT MAP( in_pc => progCounter, out_imem => currentInst);
-rf0: rf PORT Map ( clk => clk, WE3 => cRegWrite, A1 => RF1, A2 => RF2, A3 => currentInst_A3 , WD3 => result , RD1 => sourceA, RD2 => register2 );
+rf0: rf PORT Map ( clk => clk_curr, WE3 => cRegWrite, A1 => RF1, A2 => RF2, A3 => currentInst_A3 , WD3 => result , RD1 => sourceA, RD2 => register2 );
 alu0: ALU_FPGA PORT MAP( SrcA => sourceA, SrcB => sourceB, ALU_Control => cALUOpcode, ALU_Result => ALUResult, Flag_Zero => zero, Flag_Negative => negative );
 cu0: control_unit PORT MAP( opcode => currentInst( 31 downto 26), funct => currentInst( 5 downto 0), controlReg => tempCoontrolReg );
 dmem0: dmem PORT MAP ( clk => clk1, WE => WE, A => a, WD => WD, RD => memReadData);
