@@ -47,6 +47,7 @@ end component;
     constant clk_period : time := 10 ns; -- modifiable clock period
     constant input_period : time := 1 ns;
     constant cycle_time : time := 50000000 ps; -- avg + buffer time to reach a HALT command
+    constant enc_mode_start : time := 800000 ns; -- start time for enc_mode, tHAL thrown
     
 begin
      
@@ -73,19 +74,8 @@ begin
          tClk <= '1';
          wait for clk_period/2;
     end process;
-    
---  Reset Process
-    rst_process: process
-    begin
-        tRst <= '0';
-        wait for 340ns;
-        
-        tRst <= '1';
-        wait for clk_period;
-        tRst <= '0';
-        wait;
-        
-    end process;
+
+
     
     -- Stimulus process (how other parts of the TB should behave
     -- ---------------------------------------------------------------------MAKE THIS FOR INPUT ONLY ---------------------------------------------------------
@@ -93,10 +83,7 @@ begin
     begin   
        tIP <= '0'; -- set to input
        tMode <= "00"; -- set to key expansion mode
-       
-       
        -- Key Expansion
-       
        -- 0
        tBackdoorInput <= '0';
        tBackdoorInputVals <= "00000000";
@@ -205,7 +192,61 @@ begin
        tBackdoorInputVals <= "00000000";
        tBackdoorInput <= '0';
        tIP <= '1'; -- set to input
+        
+       -- Reset the CPU
+       wait for 330 ns;      
+       tRst <= '0';
+       wait for 340ns;
+       tRst <= '1';
+       wait for clk_period;
+       tRst <= '0';
+       
+       -- enc_mode
+       wait for enc_mode_start;
+       tIP <= '0';
+       tMode <= "01";
+       
+       -- Data 0
+       tBackdoorInput <= '0';
+       tBackdoorInputVals <= "00000000";
+       wait for clk_period;
+       tBackdoorInput <= '1';
+       wait for clk_period;
+       -- Data 1
+       tBackdoorInput <= '0';
+       tBackdoorInputVals <= "00000001";
+       wait for clk_period;
+       tBackdoorInput <= '1';
+       wait for clk_period;
+       -- Data 2
+       tBackdoorInput <= '0';
+       tBackdoorInputVals <= "00000010";
+       wait for clk_period;
+       tBackdoorInput <= '1';
+       wait for clk_period;
+       -- Data 3
+       tBackdoorInput <= '0';
+       tBackdoorInputVals <= "00000011";
+       wait for clk_period;
+       tBackdoorInput <= '1';
+       wait for 70 ns;
+       
+       -- EXECUTE Encryption
+       tIP <= '1';
+       -- toggle the RST
+       tRst <= '0';
+       wait for 340ns;
+       tRst <= '1';
+       wait for clk_period;
+       tRst <= '0';
+       
+       -- toggle 
+       
+       
        wait;
-       --wait for cycle_time;
     end process;
+    
+        
+
+         
 end testbench;
