@@ -54,6 +54,7 @@ end component;
     constant cycle_time : time := 50000000 ps; -- avg + buffer time to reach a HALT command
     constant enc_mode_start : time := 800000 ns; -- start time for enc_mode, tHAL thrown
     constant enc_mode_end : time := 70000 ns; -- end time for enc_mode
+    constant rst_mode_bounce : time := 340 ns;
     
 begin
      
@@ -266,73 +267,70 @@ begin
        tBackdoorInputVals <= "00000000";
        -- toggle the RST
        tRst <= '0';
-       wait for 340ns;
+       wait for rst_mode_bounce;
        tRst <= '1';
        wait for clk_period;
        tRst <= '0';
       
         
-         -- decrypt mode
-             wait for enc_mode_start;
-             
-             -- assign values
-             tEncDoutA <= tOutA;
-             tEncDoutB <= tOutB;
-
-             tIP <= '0';
-             tMode <= "10";
+      -- SWITCH to decrypt mode
+      wait for enc_mode_start;
+      -- assign values
+      tEncDoutA <= tOutA;
+      tEncDoutB <= tOutB;
+       tIP <= '0';
+       tMode <= "10";
      
-     
-          -- Data 1
-          wait for 2 ns;
-          tBackdoorInput <= '0';
-          tBackdoorInputVals <= tEncDoutA(31 downto 24);
-          wait for clk_period;
-          tBackdoorInput <= '1';
-          wait for clk_period;
-          -- Data 2
-          tBackdoorInput <= '0';
-          tBackdoorInputVals <= tEncDoutA(23 downto 16);
-          wait for clk_period;
-          tBackdoorInput <= '1';
-          wait for clk_period;
-          -- Data 3
-          tBackdoorInput <= '0';
-          tBackdoorInputVals <= tEncDoutA(15 downto 8);
-          wait for clk_period;
-          tBackdoorInput <= '1';
-          wait for clk_period;
-          -- Data 4
-          tBackdoorInput <= '0';
-          tBackdoorInputVals <= tEncDoutA(7 downto 0);
-          wait for clk_period;
-          tBackdoorInput <= '1';
-          wait for clk_period;
-          -- Data 5
-          tBackdoorInput <= '0';
-          tBackdoorInputVals <= tEncDoutB(31 downto 24);
-          wait for clk_period;
-          tBackdoorInput <= '1';
-          wait for clk_period;
-          -- Data 6
-          tBackdoorInput <= '0';
-          tBackdoorInputVals <= tEncDoutB(23 downto 16);
-          wait for clk_period;
-          tBackdoorInput <= '1';
-          wait for clk_period;
-          -- Data 7
-          tBackdoorInput <= '0';
-          tBackdoorInputVals <= tEncDoutB(15 downto 8);
-          wait for clk_period;
-          tBackdoorInput <= '1';
-          wait for clk_period;
-          -- Data 8
-          tBackdoorInput <= '0';
-          tBackdoorInputVals <= tEncDoutB(7 downto 0);
-          wait for clk_period;
-          tBackdoorInput <= '1';
-          wait for clk_period;
-          tBackdoorInput <= '0';
+      -- Data 1
+      wait for 2 ns;
+      tBackdoorInput <= '0';
+      tBackdoorInputVals <= tEncDoutA(31 downto 24);
+      wait for clk_period;
+      tBackdoorInput <= '1';
+      wait for clk_period;
+      -- Data 2
+      tBackdoorInput <= '0';
+      tBackdoorInputVals <= tEncDoutA(23 downto 16);
+      wait for clk_period;
+      tBackdoorInput <= '1';
+      wait for clk_period;
+      -- Data 3
+      tBackdoorInput <= '0';
+      tBackdoorInputVals <= tEncDoutA(15 downto 8);
+      wait for clk_period;
+      tBackdoorInput <= '1';
+      wait for clk_period;
+      -- Data 4
+      tBackdoorInput <= '0';
+      tBackdoorInputVals <= tEncDoutA(7 downto 0);
+      wait for clk_period;
+      tBackdoorInput <= '1';
+      wait for clk_period;
+      -- Data 5
+      tBackdoorInput <= '0';
+      tBackdoorInputVals <= tEncDoutB(31 downto 24);
+      wait for clk_period;
+      tBackdoorInput <= '1';
+      wait for clk_period;
+      -- Data 6
+      tBackdoorInput <= '0';
+      tBackdoorInputVals <= tEncDoutB(23 downto 16);
+      wait for clk_period;
+      tBackdoorInput <= '1';
+      wait for clk_period;
+      -- Data 7
+      tBackdoorInput <= '0';
+      tBackdoorInputVals <= tEncDoutB(15 downto 8);
+      wait for clk_period;
+      tBackdoorInput <= '1';
+      wait for clk_period;
+      -- Data 8
+      tBackdoorInput <= '0';
+      tBackdoorInputVals <= tEncDoutB(7 downto 0);
+      wait for clk_period;
+      tBackdoorInput <= '1';
+      wait for clk_period;
+      tBackdoorInput <= '0';
 
                  
        -- EXECUTE Decryption
@@ -341,7 +339,7 @@ begin
        tBackdoorInputVals <= "00000000";
        -- toggle the RST
        tRst <= '0';
-       wait for 340ns;
+       wait for rst_mode_bounce;
        tRst <= '1';
        wait for clk_period;
        tRst <= '0';
@@ -349,8 +347,5 @@ begin
        
        wait;
     end process;
-    
-        
-
          
 end testbench;
