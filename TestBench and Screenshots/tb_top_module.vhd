@@ -185,7 +185,6 @@ begin
        tBackdoorInput <= '0';
 
 
-
        -- switch to execution mode
        tBackdoorInputVals <= "00000000";
        tIP <= '1'; -- set to input
@@ -267,13 +266,75 @@ begin
        tRst <= '1';
        wait for clk_period;
        tRst <= '0';
-       
-      -- SWITCH to dectyption mode
       
-      -- INPUT decryption values
-      
-      -- EXECUTE  decryption 
-      
+        
+ -- enc_mode
+     wait for enc_mode_start;
+     tIP <= '0';
+     tMode <= "10";
+     
+     
+          -- Data 1
+          tBackdoorInput <= '0';
+          tBackdoorInputVals <= "10010100";
+          wait for clk_period;
+          tBackdoorInput <= '1';
+          wait for clk_period;
+          -- Data 2
+          tBackdoorInput <= '0';
+          tBackdoorInputVals <= "10000101";
+          wait for clk_period;
+          tBackdoorInput <= '1';
+          wait for clk_period;
+          -- Data 3
+          tBackdoorInput <= '0';
+          tBackdoorInputVals <= "00010001";
+          wait for clk_period;
+          tBackdoorInput <= '1';
+          wait for clk_period;
+          -- Data 4
+          tBackdoorInput <= '0';
+          tBackdoorInputVals <= "10111001";
+          wait for clk_period;
+          tBackdoorInput <= '1';
+          wait for clk_period;
+          -- Data 5
+          tBackdoorInput <= '0';
+          tBackdoorInputVals <= "00101011";
+          wait for clk_period;
+          tBackdoorInput <= '1';
+          wait for clk_period;
+          -- Data 6
+          tBackdoorInput <= '0';
+          tBackdoorInputVals <= "11010000";
+          wait for clk_period;
+          tBackdoorInput <= '1';
+          wait for clk_period;
+          -- Data 7
+          tBackdoorInput <= '0';
+          tBackdoorInputVals <= "00101011";
+          wait for clk_period;
+          tBackdoorInput <= '1';
+          wait for clk_period;
+          -- Data 8
+          tBackdoorInput <= '0';
+          tBackdoorInputVals <= "10000110";
+          wait for clk_period;
+          tBackdoorInput <= '1';
+          wait for clk_period;
+          tBackdoorInput <= '0';
+
+                 
+       -- EXECUTE Decryption
+       wait for 10 ns;
+       tIP <= '1';
+       tBackdoorInputVals <= "00000000";
+       -- toggle the RST
+       tRst <= '0';
+       wait for 340ns;
+       tRst <= '1';
+       wait for clk_period;
+       tRst <= '0';
        
        
        wait;
