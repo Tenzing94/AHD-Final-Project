@@ -6,9 +6,12 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.numeric_std.all;
 use STD.TEXTIO.ALL;
+USE	WORK.PKG.ALL;
+
 
 entity tb_top_module is
 end tb_top_module;
+
 
 architecture testbench of tb_top_module is
 
@@ -24,7 +27,8 @@ component top_module is
        mode: in std_logic_vector(1 downto 0);
        input_or_process: in STD_LOGIC; -- input or execution, mode selection
        pc_output : out std_logic_vector (31 downto 0);
-       debug : out std_logic_vector(3 downto 0)
+       debug : out std_logic_vector(3 downto 0);
+       reg_out    : out Register_Type
       );
 end component;
 
@@ -35,6 +39,7 @@ end component;
     signal tBit_Flags : std_logic_vector(8 downto 0); -- led output
     signal tHal : std_logic; -- HALT signal
     signal tPC : std_logic_vector(31 downto 0); -- pc output
+    signal tRegOut : Register_Type;
     -- dmem signals
     signal tBackdoorInput : std_logic;
     signal tBackdoorInputVals : std_logic_vector(7 downto 0);
@@ -71,7 +76,8 @@ begin
             mode => tMode,
             input_or_process => tIP,
             debug => tDebug,
-            pc_output => tPC);
+            pc_output => tPC,
+            reg_out => tRegOut);
    
 --    Clock process (how the clock should behave)
     clk_process : process
