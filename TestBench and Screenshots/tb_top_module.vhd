@@ -92,6 +92,14 @@ begin
     
     -- Stimulus process (how other parts of the TB should behave
     stim_proc: process
+    --FILE in_file : TEXT OPEN READ_MODE IS "din_values";
+    --FILE out_file : TEXT OPEN WRITE_MODE IS "dout_values";
+    VARIABLE out_line : LINE;
+    VARIABLE in_line : LINE;
+    VARIABLE v_key : std_logic_vector(63 downto 0);
+    VARIABLE v_din : std_logic_vector(31 downto 0);
+    VARIABLE v_dout : std_logic_vector(31 downto 0);
+
     begin   
        tIP <= '0'; -- set to input
        tMode <= "00"; -- set to key expansion mode
