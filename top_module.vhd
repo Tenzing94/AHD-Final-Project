@@ -22,6 +22,7 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.numeric_std.all;
+USE	WORK.PKG.ALL;
 
 -- Uncomment the following library declaration if using
 -- arithmetic functions with Signed or Unsigned values
@@ -44,6 +45,7 @@ entity top_module is
            mode : in STD_LOGIC_VECTOR(1 downto 0); -- encryption, decryption, keygeneration
            input_or_process: in STD_LOGIC; -- input or execution, mode selection
            pc_output : out STD_LOGIC_VECTOR(31 downto 0);
+           reg_out    : out Register_Type;
            debug : out std_logic_vector(3 downto 0)
           );
 end top_module;
@@ -72,7 +74,8 @@ component rf
     Port (
         CLK, WE3   : in std_logic;
         A1, A2, A3 : in std_logic_vector(4 downto 0);
-        WD3        : in std_logic_vector(31 downto 0);   
+        WD3        : in std_logic_vector(31 downto 0);
+        reg_out    : out Register_Type;   
         RD1, RD2   : out std_logic_vector(31 downto 0));
 end component;
 
@@ -444,7 +447,7 @@ end process;
 
 pc1: pc PORT MAP(in_pc => demux_pc, clr => rst, clk => clk_curr, out_pc => progCounter, mode => mode );
 imem0: imem PORT MAP( in_pc => progCounter, out_imem => currentInst);
-rf0: rf PORT Map ( clk => clk_curr, WE3 => cRegWrite, A1 => RF1, A2 => RF2, A3 => currentInst_A3 , WD3 => result , RD1 => sourceA, RD2 => register2 );
+rf0: rf PORT Map ( clk => clk_curr, WE3 => cRegWrite, A1 => RF1, A2 => RF2, A3 => currentInst_A3 , WD3 => result , RD1 => sourceA, RD2 => register2, reg_out => reg_out );
 alu0: ALU_FPGA PORT MAP( SrcA => sourceA, SrcB => sourceB, ALU_Control => cALUOpcode, ALU_Result => ALUResult, Flag_Zero => zero, Flag_Negative => negative );
 cu0: control_unit PORT MAP( opcode => currentInst( 31 downto 26), funct => currentInst( 5 downto 0), controlReg => tempCoontrolReg );
 dmem0: dmem PORT MAP ( clk => clk1, WE => WE, A => a, WD => WD, RD => memReadData);

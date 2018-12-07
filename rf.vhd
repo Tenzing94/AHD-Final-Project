@@ -22,19 +22,20 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.numeric_std.all;
+USE	WORK.PKG.ALL;
 
 entity rf is
     Port (
             CLK, WE3   : in std_logic;
             A1, A2, A3 : in std_logic_vector(4 downto 0);
-            WD3        : in std_logic_vector(31 downto 0);   
+            WD3        : in std_logic_vector(31 downto 0); 
+            reg_out    : out Register_Type;  
             RD1, RD2   : out std_logic_vector(31 downto 0)
     );
 end rf;
 
 architecture Behavioral of rf is
 
-type Register_Type is array (0 to 31) of std_logic_vector(31 downto 0);
 
 signal Reg32 : Register_Type := (
     "00000000000000000000000000000000", "00000000000000000000000000000000",
@@ -57,6 +58,8 @@ signal Reg32 : Register_Type := (
 
 begin
 
+    reg_out <= Reg32;
+    
     -- write
     process(CLK)
     begin

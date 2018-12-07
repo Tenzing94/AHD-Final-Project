@@ -21,6 +21,8 @@
 
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.numeric_std.all;
+USE	WORK.PKG.ALL;
 
 -- Uncomment the following library declaration if using
 -- arithmetic functions with Signed or Unsigned values
@@ -75,6 +77,7 @@ component top_module is
            mode : in STD_LOGIC_VECTOR(1 downto 0);
            input_or_process: in STD_LOGIC;
            pc_output : out STD_LOGIC_VECTOR(31 downto 0);
+           reg_out    : out Register_Type;
            debug : out std_logic_vector(3 downto 0)
           );
 end component;
@@ -129,7 +132,9 @@ signal SW_temp : std_logic_vector(15 downto 0) := x"0000";
 signal debug: std_logic_vector(3 downto 0);
 
 signal pc_output,display_A_final, display_B_final : std_logic_vector(31 downto 0);
-
+signal reg_counter: integer := 0;
+signal sig_reg_out : Register_Type;
+signal sig_output_type : std_logic_vector(1 downto 0);
 begin
 
 ------------------------------ PORT MAPS ------------------------------
@@ -137,7 +142,7 @@ DBBTNC  : debouncer PORT MAP (clk => sig_clk_100Mhz, button_in => sig_BTNC, puls
 DBBTND  : debouncer PORT MAP (clk => sig_clk_100Mhz, button_in => sig_BTND, pulse_out => sig_clock_select);
 --DBBTNL  : debouncer PORT MAP (clk => sig_clk_100Mhz, button_in => sig_BTNL, pulse_out => sig_input_button);
 CLKSLOW : clk_slow PORT MAP (clk_in => sig_clk_100Mhz, clk_out => sig_clk_slow);
-TOP     : top_module PORT MAP (clk => sig_clock_in, rst => BTNU,outputA => sig_outputA, outputB => sig_outputB, bit_flags => sig_bit_flags, hal =>  hal, backdoor_input_button => SW(0), backdoor_input_values => SW(15 downto 8), input_or_process => SW(3), mode => SW(2 downto 1), debug => debug, pc_output => pc_output );
+TOP     : top_module PORT MAP (clk => sig_clock_in, rst => BTNU,outputA => sig_outputA, outputB => sig_outputB, bit_flags => sig_bit_flags, hal =>  hal, backdoor_input_button => SW(0), backdoor_input_values => SW(15 downto 8), input_or_process => SW(3), mode => SW(2 downto 1), debug => debug, pc_output => pc_output, reg_out => sig_reg_out );
 CLKSSD  : clk_for_ssd PORT MAP (clk_in => sig_clk_100Mhz, clk_out => sig_clk_for_ssd);
 SSD     : seven_seg PORT MAP (clk_for_ssd => sig_clk_for_ssd, ss_input => sig_output, Cathode_Pattern => sig_cathode, AN_Activate => sig_anode);
 
@@ -158,6 +163,9 @@ LED(9) <= sig_input_button;
 LED(10) <= BTNU;
 LED(14 downto 11) <= debug;
 
+sig_output_type(1) <= SW(7);
+sig_output_type(0) <= SW(6);
+
 process(sig_clock_select)
 begin
     if (sig_clock_select'event and sig_clock_select = '1') then
@@ -169,6 +177,26 @@ begin
                   
     end if;
 end process;
+
+
+-- process for reg file counter
+-- up count
+process(sig_output_type(0), sig_output_type(1))
+begin
+    if(sig_output_type(1) = '1') then
+       reg_counter <= 0;     
+    elsif(rising_edge(sig_output_type(0))) then 
+        -- Up counter 
+       if( reg_counter = 31 ) then
+        reg_counter <= 0;
+       else
+        reg_counter <= reg_counter + 1;
+       end if;
+    end if;
+end process;
+
+
+
 
 with sig_toggle_clk select
      sig_clock_in  <= sig_clk_slow when '1',
@@ -183,12 +211,14 @@ with SW(3) select
                       x"00000000" when others;
 
 --Select for PC or output
-with SW(4) select
-    display_A_final <= pc_output when '1',
+with SW(5 downto 4) select
+    display_A_final <= pc_output when "01",
+                       std_logic_vector(to_unsigned(reg_counter, display_A_final'length)) when "10",
                        input_displayA when others;
                        
-with SW(4) select
-    display_B_final <= pc_output when '1',
+with SW(5 downto 4) select
+    display_B_final <= pc_output when "01",
+                       sig_reg_out(reg_counter) when "10",
                        input_displayB when others;   
 
 with BTNR select
