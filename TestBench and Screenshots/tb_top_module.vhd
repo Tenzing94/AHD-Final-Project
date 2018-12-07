@@ -182,12 +182,12 @@ begin
        wait for clk_period;
        tBackdoorInput <= '1';
        wait for clk_period;
+       tBackdoorInput <= '0';
 
 
 
        -- switch to execution mode
        tBackdoorInputVals <= "00000000";
-       tBackdoorInput <= '0';
        tIP <= '1'; -- set to input
         
        -- Reset the CPU
@@ -197,7 +197,6 @@ begin
        
        -- enc_mode
        wait for enc_mode_start;
-       
        tIP <= '0';
        tMode <= "01";
        
@@ -237,6 +236,12 @@ begin
        wait for clk_period;
        tBackdoorInput <= '1';
        wait for clk_period;
+       -- Data 5
+       tBackdoorInput <= '0';
+       tBackdoorInputVals <= "00000000";
+       wait for clk_period;
+       tBackdoorInput <= '1';
+       wait for clk_period;
        -- Data 6
        tBackdoorInput <= '0';
        tBackdoorInputVals <= "00000001";
@@ -244,10 +249,18 @@ begin
        tBackdoorInput <= '1';
        wait for clk_period;
        tBackdoorInput <= '0';
-       wait for 70 ns;
-       
+       -- Data 7
+       tBackdoorInput <= '0';
+       tBackdoorInputVals <= "00000001";
+       wait for clk_period;
+       tBackdoorInput <= '1';
+       wait for clk_period;
+       tBackdoorInput <= '0';
+           
        -- EXECUTE Encryption
+       wait for 10 ns;
        tIP <= '1';
+       tBackdoorInputVals <= "00000000";
        -- toggle the RST
        tRst <= '0';
        wait for 340ns;
@@ -255,7 +268,12 @@ begin
        wait for clk_period;
        tRst <= '0';
        
-      -- Switch to dectyption 
+      -- SWITCH to dectyption mode
+      
+      -- INPUT decryption values
+      
+      -- EXECUTE  decryption 
+      
        
        
        wait;
