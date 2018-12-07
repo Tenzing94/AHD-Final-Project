@@ -41,6 +41,11 @@ end component;
     signal tMode : std_logic_vector(1 downto 0);
     signal tIP : std_logic;
     signal tDebug : std_logic_vector(3 downto 0);
+    -- dout signals
+    signal tEncDoutA : std_logic_vector(31 downto 0);
+    signal tEncDoutB : std_logic_vector(31 downto 0);
+
+    
     
     -- clock-specific signals
     signal tClk : std_logic := '0'; -- init. the clock (required!)
@@ -79,7 +84,6 @@ begin
 
     
     -- Stimulus process (how other parts of the TB should behave
-    -- ---------------------------------------------------------------------MAKE THIS FOR INPUT ONLY ---------------------------------------------------------
     stim_proc: process
     begin   
        tIP <= '0'; -- set to input
@@ -268,57 +272,63 @@ begin
        tRst <= '0';
       
         
- -- enc_mode
-     wait for enc_mode_start;
-     tIP <= '0';
-     tMode <= "10";
+         -- decrypt mode
+             wait for enc_mode_start;
+             
+             -- assign values
+             tEncDoutA <= tOutA;
+             tEncDoutB <= tOutB;
+
+             tIP <= '0';
+             tMode <= "10";
      
      
           -- Data 1
+          wait for 2 ns;
           tBackdoorInput <= '0';
-          tBackdoorInputVals <= "10010100";
+          tBackdoorInputVals <= tEncDoutA(31 downto 24);
           wait for clk_period;
           tBackdoorInput <= '1';
           wait for clk_period;
           -- Data 2
           tBackdoorInput <= '0';
-          tBackdoorInputVals <= "10000101";
+          tBackdoorInputVals <= tEncDoutA(23 downto 16);
           wait for clk_period;
           tBackdoorInput <= '1';
           wait for clk_period;
           -- Data 3
           tBackdoorInput <= '0';
-          tBackdoorInputVals <= "00010001";
+          tBackdoorInputVals <= tEncDoutA(15 downto 8);
           wait for clk_period;
           tBackdoorInput <= '1';
           wait for clk_period;
           -- Data 4
           tBackdoorInput <= '0';
-          tBackdoorInputVals <= "10111001";
+          tBackdoorInputVals <= tEncDoutA(7 downto 0);
           wait for clk_period;
           tBackdoorInput <= '1';
           wait for clk_period;
           -- Data 5
           tBackdoorInput <= '0';
-          tBackdoorInputVals <= "00101011";
+          tBackdoorInputVals <= tEncDoutB(31 downto 24);
           wait for clk_period;
           tBackdoorInput <= '1';
           wait for clk_period;
           -- Data 6
           tBackdoorInput <= '0';
-          tBackdoorInputVals <= "11010000";
+          tBackdoorInputVals <= tEncDoutB(23 downto 16);
           wait for clk_period;
           tBackdoorInput <= '1';
           wait for clk_period;
           -- Data 7
           tBackdoorInput <= '0';
-          tBackdoorInputVals <= "00101011";
+          tBackdoorInputVals <= tEncDoutB(15 downto 8);
           wait for clk_period;
           tBackdoorInput <= '1';
           wait for clk_period;
           -- Data 8
           tBackdoorInput <= '0';
-          tBackdoorInputVals <= "10000110";
+          tBackdoorInputVals <= tEncDoutB(7 downto 0);
           wait for clk_period;
           tBackdoorInput <= '1';
           wait for clk_period;
