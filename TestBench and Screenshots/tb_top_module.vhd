@@ -7,6 +7,8 @@ use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.numeric_std.all;
 use STD.TEXTIO.ALL;
 USE	WORK.PKG.ALL;
+USE IEEE.STD_LOGIC_TEXTIO.ALL;
+
 
 
 entity tb_top_module is
@@ -93,20 +95,22 @@ begin
     
     -- Stimulus process (how other parts of the TB should behave
     stim_proc: process
-    FILE din_file : TEXT OPEN READ_MODE IS "din_values.txt";
+    FILE din_file : TEXT OPEN READ_MODE IS "din.txt";
     --FILE key_file : TEXT OPEN READ_MODE IS "key_values";
     --FILE dout_file : TEXT OPEN WRITE_MODE IS "dout_values";
     VARIABLE dout_line : LINE;
     VARIABLE din_line : LINE;
     VARIABLE key_line : LINE;
+    variable good: boolean; --status of the read operation
+
     VARIABLE vt_key : std_logic_vector(63 downto 0);
-    variable v_din : INTEGER;
+    variable dintest : std_logic_vector(31 downto 0);
     VARIABLE vt_dout : std_logic_vector(31 downto 0);
 
     begin   
     WHILE NOT ENDFILE(din_file) LOOP
     READLINE(din_file, din_line); --get line of input stimulus
-    READ(din_line, v_din); --get first operand
+    READ(din_line, dintest, good); --get first operand
     
        tIP <= '0'; -- set to input
        tMode <= "00"; -- set to key expansion mode
@@ -229,28 +233,27 @@ begin
        -- Data 0
        tBackdoorInput <= '0';
        -- type conversion
-       tDINTEST <= std_logic_vector(to_unsigned(v_din, tDINTEST'length));
 
        
-       tBackdoorInputVals <= tDINTEST(31 downto 24);
+       tBackdoorInputVals <= dintest(31 downto 24);
        wait for clk_period;
        tBackdoorInput <= '1';
        wait for clk_period;
        -- Data 1
        tBackdoorInput <= '0';
-       tBackdoorInputVals <= tDINTEST(23 downto 16);
+       tBackdoorInputVals <= dintest(23 downto 16);
        wait for clk_period;
        tBackdoorInput <= '1';
        wait for clk_period;
        -- Data 2
        tBackdoorInput <= '0';
-       tBackdoorInputVals <= tDINTEST(15 downto 8);
+       tBackdoorInputVals <= dintest(15 downto 8);
        wait for clk_period;
        tBackdoorInput <= '1';
        wait for clk_period;
        -- Data 3
        tBackdoorInput <= '0';
-       tBackdoorInputVals <= tDINTEST(7 downto 0);
+       tBackdoorInputVals <= dintest(7 downto 0);
        wait for clk_period;
        tBackdoorInput <= '1';
        wait for clk_period;
