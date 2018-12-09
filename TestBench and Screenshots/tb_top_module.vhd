@@ -125,97 +125,97 @@ begin
        -- INPUT: Key Expansion
        -- 0
        tBackdoorInput <= '0';
-       tBackdoorInputVals <= vt_key(127 downto 120);
+       tBackdoorInputVals <= vt_key(126 downto 119);
        wait for clk_period;
        tBackdoorInput <= '1';
        wait for clk_period;
        -- 1
        tBackdoorInput <= '0';
-       tBackdoorInputVals <= vt_key(126 downto 119);
+       tBackdoorInputVals <= vt_key(118 downto 111);
        wait for clk_period;
        tBackdoorInput <= '1';
        wait for clk_period;
        --2
        tBackdoorInput <= '0';
-       tBackdoorInputVals <= vt_key(118 downto 111);
+       tBackdoorInputVals <= vt_key(110 downto 103);
        wait for clk_period;
        tBackdoorInput <= '1';
        wait for clk_period;
        --3
        tBackdoorInput <= '0';
-       tBackdoorInputVals <= vt_key(110 downto 103);
+       tBackdoorInputVals <= vt_key(102 downto 95);
        wait for clk_period;
        tBackdoorInput <= '1';
        wait for clk_period;
        --4
        tBackdoorInput <= '0';
-       tBackdoorInputVals <= vt_key(102 downto 95);
+       tBackdoorInputVals <= vt_key(94 downto 86);
        wait for clk_period;
        tBackdoorInput <= '1';
        wait for clk_period;
        --5
        tBackdoorInput <= '0';
-       tBackdoorInputVals <= vt_key(94 downto 87);
+       tBackdoorInputVals <= vt_key(87 downto 80);
        wait for clk_period;
        tBackdoorInput <= '1';
        wait for clk_period;
        --6
        tBackdoorInput <= '0';
-       tBackdoorInputVals <= vt_key(87 downto 80);
+       tBackdoorInputVals <= vt_key(79 downto 72);
        wait for clk_period;
        tBackdoorInput <= '1';
        wait for clk_period;
        --7
        tBackdoorInput <= '0';
-       tBackdoorInputVals <= vt_key(79 downto 72);
+       tBackdoorInputVals <= vt_key(71 downto 64);
        wait for clk_period;
        tBackdoorInput <= '1';
        wait for clk_period;
        --8
        tBackdoorInput <= '0';
-       tBackdoorInputVals <= vt_key(71 downto 64);
+       tBackdoorInputVals <= vt_key(63 downto 56);
        wait for clk_period;
        tBackdoorInput <= '1';
        wait for clk_period;
        --9
        tBackdoorInput <= '0';
-       tBackdoorInputVals <= vt_key(63 downto 56);
+       tBackdoorInputVals <= vt_key(55 downto 48);
        wait for clk_period;
        tBackdoorInput <= '1';
        wait for clk_period;
        --10
        tBackdoorInput <= '0';
-       tBackdoorInputVals <=  vt_key(55 downto 48);
+       tBackdoorInputVals <=  vt_key(47 downto 40);
        wait for clk_period;
        tBackdoorInput <= '1';
        wait for clk_period;
        --11
        tBackdoorInput <= '0';
-       tBackdoorInputVals <= vt_key(47 downto 40);
+       tBackdoorInputVals <= vt_key(39 downto 32);
        wait for clk_period;
        tBackdoorInput <= '1';
        wait for clk_period;
        --12
        tBackdoorInput <= '0';
-       tBackdoorInputVals <= vt_key(39 downto 32);
+       tBackdoorInputVals <= vt_key(31 downto 24);
        wait for clk_period;
        tBackdoorInput <= '1';
        wait for clk_period;
        --13
        tBackdoorInput <= '0';
-       tBackdoorInputVals <= vt_key(31 downto 24);
+       tBackdoorInputVals <= vt_key(23 downto 16);
        wait for clk_period;
        tBackdoorInput <= '1';
        wait for clk_period;
        --14
        tBackdoorInput <= '0';
-       tBackdoorInputVals <= vt_key(23 downto 16);
+       tBackdoorInputVals <= vt_key(15 downto 8);
        wait for clk_period;
        tBackdoorInput <= '1';
        wait for clk_period;
        --15
        tBackdoorInput <= '0';
-       tBackdoorInputVals <= vt_key(15 downto 8);
+       tBackdoorInputVals <= vt_key(7 downto 0);
        wait for clk_period;
        tBackdoorInput <= '1';
        wait for clk_period;
@@ -305,6 +305,7 @@ begin
        tIP <= '0';
        tMode <= "10";
      
+      -- INPUT: Decryption Mode
       -- Data 1
       wait for 2 ns;
       tBackdoorInput <= '0';
