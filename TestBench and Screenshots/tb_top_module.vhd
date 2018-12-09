@@ -9,6 +9,8 @@ use STD.TEXTIO.ALL;
 USE	WORK.PKG.ALL;
 USE IEEE.STD_LOGIC_TEXTIO.ALL;
 
+
+
 -- DONT FILL IN
 entity tb_top_module is
 end tb_top_module;
@@ -375,6 +377,19 @@ begin
        tRst <= '1';
        wait for clk_period;
        tRst <= '0';
+       
+       -- check tb against tHAL
+       wait for enc_mode_start;
+       
+       assert (tHal='1') report "Decryption Finished" severity error;
+       
+       -- write key to file
+       -- write din to file
+       -- write dout to file
+       -- check if dout from tb matches dout from waveform (concatenate it)
+       
+       
+
        
        end loop;
        wait;
