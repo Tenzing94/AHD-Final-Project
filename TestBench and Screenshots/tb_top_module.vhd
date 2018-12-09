@@ -68,8 +68,7 @@ end component;
     signal tDebug : std_logic_vector(3 downto 0);
     -- dout signals
     signal tEncDoutA : std_logic_vector(31 downto 0);
-    signal tEncDoutB : std_logic_vector(31 downto 0);
-        
+    signal tEncDoutB : std_logic_vector(31 downto 0);        
     
     -- clock-specific signals
     signal tClk : std_logic := '0'; -- init. the clock (required!)
@@ -98,9 +97,6 @@ begin
             pc_output => tPC,
             reg_out => tRegOut);
    
-
-   
-   
 --    Clock process (how the clock should behave)
     clk_process : process
     begin
@@ -110,46 +106,51 @@ begin
          wait for clk_period/2;
     end process;
 
-
     
-    -- Stimulus process (how other parts of the TB should behave
+    -- MAIN PROCESS LOOP
     stim_proc: process
+    
+    -- TEXTIO
     FILE key_file : TEXT OPEN READ_MODE IS "key_input.txt";
     FILE din_file : TEXT OPEN READ_MODE IS "enc_input.txt";
-    
-    FILE dec_file : TEXT OPEN READ_MODE IS "dec_input.txt"; -- decryption file to check against
-    FILE out_file : TEXT OPEN WRITE_MODE IS "output_write.txt";
-
-    
+    -- expected decoded (final result) file
+    FILE dec_file : TEXT OPEN READ_MODE IS "dec_input.txt";
+    -- output file
+    FILE out_file : TEXT OPEN WRITE_MODE IS "write_out.txt";
     VARIABLE key_line : LINE;
     VARIABLE din_line : LINE;
     VARIABLE dec_line : LINE;
     VARIABLE out_line : LINE;        
-
     variable good: boolean; --status of the read operation
-
     VARIABLE vt_key : std_logic_vector(127 downto 0);
     VARIABLE vt_din : std_logic_vector(63 downto 0);
     VARIABLE vt_dec : std_logic_vector(63 downto 0);
+    
 
     begin   
     WHILE NOT ENDFILE(din_file) LOOP
 
-
+    -- TCL output
+    write(std.textio.OUTPUT, "" & LF); -- newline
+    WRITE(OUTPUT,string'("--RUN --")); 
+    write(std.textio.OUTPUT, "" & LF); -- newline
     
     -- Grab Key Values from TXT
     READLINE(key_file, key_line);
     read(key_line, vt_key, good);
-    
---    -- write key value of this run
---    WRITE(out_line, "SKEY: ");            
---    WRITELINE(outfile, out_line);     
---    WRITE(out_line, vec2str(vt_key));            
---    WRITELINE(outfile, out_line);        
-    
+    -- TCL output
+     write(std.textio.OUTPUT, "" & LF); -- newline
+     WRITE(OUTPUT,string'("Skey: "));            
+     WRITE(OUTPUT, vec2str(vt_key));  
+     write(std.textio.OUTPUT, "" & LF); -- newline
+  
     -- Grab DIN Values from TXT
     READLINE(din_file, din_line);
     READ(din_line, vt_din, good);
+    -- TCL output
+     WRITE(OUTPUT,string'("DIN: "));            
+     WRITE(OUTPUT, vec2str(vt_din));  
+     write(std.textio.OUTPUT, "" & LF); -- newline
     
 --    WRITE(out_line, "DIN: ");            
 --    WRITELINE(outfile, out_line);     
@@ -159,6 +160,11 @@ begin
     -- Grab DEC values from TXT
     READLINE(dec_file, dec_line);
     READ(dec_line, vt_dec, good);   
+    
+     -- TCL output
+     WRITE(OUTPUT,string'("DEC_Expected: "));            
+     WRITE(OUTPUT, vec2str(vt_dec));  
+     write(std.textio.OUTPUT, "" & LF); -- newline
      
 --    WRITE(out_line, "Expected DOUT: ");            
 --    WRITELINE(outfile, out_line);     
@@ -422,7 +428,9 @@ begin
               
        if(tHal='1') then
         -- write results to local console
-        write(OUTPUT, "Test Complete");
+        write(OUTPUT, "---Test Complete---");
+        write(std.textio.OUTPUT, "" & LF); -- newline     
+        write(OUTPUT, "DOUT: "); 
         write(OUTPUT, vec2str(tOutA) & vec2str(tOutB));
        end if;
        
@@ -435,7 +443,6 @@ begin
        -- check if dout from tb matches dout from waveform (concatenate it)
        
        
-
        
        end loop;
        wait;
