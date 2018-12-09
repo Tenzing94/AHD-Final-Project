@@ -94,17 +94,20 @@ begin
     
     -- Stimulus process (how other parts of the TB should behave
     stim_proc: process
-    FILE din_file : TEXT OPEN READ_MODE IS "enc_input.txt";
     FILE key_file : TEXT OPEN READ_MODE IS "key_input.txt";
-    --FILE dout_file : TEXT OPEN WRITE_MODE IS "dout_values";
-    VARIABLE dout_line : LINE;
-    VARIABLE din_line : LINE;
+    FILE din_file : TEXT OPEN READ_MODE IS "enc_input.txt";
+    
+    FILE dec_file : TEXT OPEN READ_MODE IS "dec_input.txt"; -- decryption file to check against
+    FILE write_file : TEXT OPEN WRITE_MODE IS "output_write.txt"; -- final output, WRITE only
+    
     VARIABLE key_line : LINE;
+    VARIABLE din_line : LINE;
+    VARIABLE dec_line : LINE;
     variable good: boolean; --status of the read operation
 
     VARIABLE vt_key : std_logic_vector(127 downto 0);
-    VARIABLE vt_din : std_logic_vector(31 downto 0);
-    VARIABLE vt_dout : std_logic_vector(31 downto 0);
+    VARIABLE vt_din : std_logic_vector(63 downto 0);
+    VARIABLE vt_dec : std_logic_vector(63 downto 0);
 
     begin   
     WHILE NOT ENDFILE(din_file) LOOP
@@ -116,6 +119,10 @@ begin
     -- Grab DIN Values from TXT
     READLINE(din_file, din_line);
     READ(din_line, vt_din, good);
+    
+    -- Grab DEC values from TXT
+    READLINE(dec_file, dec_line);
+    READ(dec_line, vt_dec, good);
     
        -- SWITCH: Input Mode
        tIP <= '0'; -- set to input
@@ -149,13 +156,13 @@ begin
        wait for clk_period;
        --4
        tBackdoorInput <= '0';
-       tBackdoorInputVals <= vt_key(94 downto 86);
+       tBackdoorInputVals <= vt_key(94 downto 87);
        wait for clk_period;
        tBackdoorInput <= '1';
        wait for clk_period;
        --5
        tBackdoorInput <= '0';
-       tBackdoorInputVals <= vt_key(87 downto 80);
+       tBackdoorInputVals <= vt_key(86 downto 79);
        wait for clk_period;
        tBackdoorInput <= '1';
        wait for clk_period;
