@@ -9,8 +9,7 @@ use STD.TEXTIO.ALL;
 USE	WORK.PKG.ALL;
 USE IEEE.STD_LOGIC_TEXTIO.ALL;
 
-
-
+-- DONT FILL IN
 entity tb_top_module is
 end tb_top_module;
 
@@ -95,165 +94,167 @@ begin
     
     -- Stimulus process (how other parts of the TB should behave
     stim_proc: process
-    FILE din_file : TEXT OPEN READ_MODE IS "din.txt";
-    --FILE key_file : TEXT OPEN READ_MODE IS "key_values";
+    FILE din_file : TEXT OPEN READ_MODE IS "enc_input.txt";
+    FILE key_file : TEXT OPEN READ_MODE IS "key_input.txt";
     --FILE dout_file : TEXT OPEN WRITE_MODE IS "dout_values";
     VARIABLE dout_line : LINE;
     VARIABLE din_line : LINE;
     VARIABLE key_line : LINE;
     variable good: boolean; --status of the read operation
 
-    VARIABLE vt_key : std_logic_vector(63 downto 0);
-    variable dintest : std_logic_vector(31 downto 0);
+    VARIABLE vt_key : std_logic_vector(127 downto 0);
+    VARIABLE vt_din : std_logic_vector(31 downto 0);
     VARIABLE vt_dout : std_logic_vector(31 downto 0);
 
     begin   
     WHILE NOT ENDFILE(din_file) LOOP
-    READLINE(din_file, din_line); --get line of input stimulus
-    READ(din_line, dintest, good); --get first operand
     
+    -- Grab Key Values from TXT
+    READLINE(key_file, key_line);
+    read(key_line, vt_key, good);
+    
+    -- Grab DIN Values from TXT
+    READLINE(din_file, din_line);
+    READ(din_line, vt_din, good);
+    
+       -- SWITCH: Input Mode
        tIP <= '0'; -- set to input
        tMode <= "00"; -- set to key expansion mode
        tRst <= '0';
-       -- Key Expansion
+       
+       -- INPUT: Key Expansion
        -- 0
        tBackdoorInput <= '0';
-       tBackdoorInputVals <= "00000000";
+       tBackdoorInputVals <= vt_key(127 downto 120);
        wait for clk_period;
        tBackdoorInput <= '1';
        wait for clk_period;
        -- 1
        tBackdoorInput <= '0';
-       tBackdoorInputVals <= "00000000";
+       tBackdoorInputVals <= vt_key(126 downto 119);
        wait for clk_period;
        tBackdoorInput <= '1';
        wait for clk_period;
        --2
        tBackdoorInput <= '0';
-       tBackdoorInputVals <= "00000000";
+       tBackdoorInputVals <= vt_key(118 downto 111);
        wait for clk_period;
        tBackdoorInput <= '1';
        wait for clk_period;
        --3
        tBackdoorInput <= '0';
-       tBackdoorInputVals <= "00000000";
+       tBackdoorInputVals <= vt_key(110 downto 103);
        wait for clk_period;
        tBackdoorInput <= '1';
        wait for clk_period;
        --4
        tBackdoorInput <= '0';
-       tBackdoorInputVals <= "00000000";
+       tBackdoorInputVals <= vt_key(102 downto 95);
        wait for clk_period;
        tBackdoorInput <= '1';
        wait for clk_period;
        --5
        tBackdoorInput <= '0';
-       tBackdoorInputVals <= "00000000";
+       tBackdoorInputVals <= vt_key(94 downto 87);
        wait for clk_period;
        tBackdoorInput <= '1';
        wait for clk_period;
        --6
        tBackdoorInput <= '0';
-       tBackdoorInputVals <= "00000000";
+       tBackdoorInputVals <= vt_key(87 downto 80);
        wait for clk_period;
        tBackdoorInput <= '1';
        wait for clk_period;
        --7
        tBackdoorInput <= '0';
-       tBackdoorInputVals <= "00000000";
+       tBackdoorInputVals <= vt_key(79 downto 72);
        wait for clk_period;
        tBackdoorInput <= '1';
        wait for clk_period;
        --8
        tBackdoorInput <= '0';
-       tBackdoorInputVals <= "00000000";
+       tBackdoorInputVals <= vt_key(71 downto 64);
        wait for clk_period;
        tBackdoorInput <= '1';
        wait for clk_period;
        --9
        tBackdoorInput <= '0';
-       tBackdoorInputVals <= "00000000";
+       tBackdoorInputVals <= vt_key(63 downto 56);
        wait for clk_period;
        tBackdoorInput <= '1';
        wait for clk_period;
        --10
        tBackdoorInput <= '0';
-       tBackdoorInputVals <= "00000000";
+       tBackdoorInputVals <=  vt_key(55 downto 48);
        wait for clk_period;
        tBackdoorInput <= '1';
        wait for clk_period;
        --11
        tBackdoorInput <= '0';
-       tBackdoorInputVals <= "00000000";
+       tBackdoorInputVals <= vt_key(47 downto 40);
        wait for clk_period;
        tBackdoorInput <= '1';
        wait for clk_period;
        --12
        tBackdoorInput <= '0';
-       tBackdoorInputVals <= "00000000";
+       tBackdoorInputVals <= vt_key(39 downto 32);
        wait for clk_period;
        tBackdoorInput <= '1';
        wait for clk_period;
        --13
        tBackdoorInput <= '0';
-       tBackdoorInputVals <= "00000000";
+       tBackdoorInputVals <= vt_key(31 downto 24);
        wait for clk_period;
        tBackdoorInput <= '1';
        wait for clk_period;
        --14
        tBackdoorInput <= '0';
-       tBackdoorInputVals <= "00000000";
+       tBackdoorInputVals <= vt_key(23 downto 16);
        wait for clk_period;
        tBackdoorInput <= '1';
        wait for clk_period;
        --15
        tBackdoorInput <= '0';
-       tBackdoorInputVals <= "11111111";
+       tBackdoorInputVals <= vt_key(15 downto 8);
        wait for clk_period;
        tBackdoorInput <= '1';
        wait for clk_period;
        tBackdoorInput <= '0';
 
 
-       -- switch to execution mode
+       -- SWITCH MODE: to execution mode
        tBackdoorInputVals <= "00000000";
        tIP <= '1'; -- set to input
-        
        -- Reset the CPU
        tRst <= '1';
        wait for clk_period;
        tRst <= '0';
        
-       -- enc_mode
+       -- INPUT: ENCRYPTION
        wait for enc_mode_start;
        tIP <= '0';
        tMode <= "01";
-       
-       
        -- Data 0
-       tBackdoorInput <= '0';
-       -- type conversion
-
-       
-       tBackdoorInputVals <= dintest(31 downto 24);
+       tBackdoorInput <= '0';       
+       tBackdoorInputVals <= vt_din(31 downto 24);
        wait for clk_period;
        tBackdoorInput <= '1';
        wait for clk_period;
        -- Data 1
        tBackdoorInput <= '0';
-       tBackdoorInputVals <= dintest(23 downto 16);
+       tBackdoorInputVals <= vt_din(23 downto 16);
        wait for clk_period;
        tBackdoorInput <= '1';
        wait for clk_period;
        -- Data 2
        tBackdoorInput <= '0';
-       tBackdoorInputVals <= dintest(15 downto 8);
+       tBackdoorInputVals <= vt_din(15 downto 8);
        wait for clk_period;
        tBackdoorInput <= '1';
        wait for clk_period;
        -- Data 3
        tBackdoorInput <= '0';
-       tBackdoorInputVals <= dintest(7 downto 0);
+       tBackdoorInputVals <= vt_din(7 downto 0);
        wait for clk_period;
        tBackdoorInput <= '1';
        wait for clk_period;
