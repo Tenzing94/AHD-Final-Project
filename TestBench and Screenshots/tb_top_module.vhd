@@ -79,6 +79,9 @@ end component;
     constant enc_mode_end : time := 70000 ns; -- end time for enc_mode
     constant rst_mode_bounce : time := 340 ns;
     
+    signal sig_dec : std_logic_vector(63 downto 0);
+
+    
 begin
      
     -- Top Module
@@ -157,14 +160,7 @@ begin
 --    WRITE(out_line, vec2str(vt_din));            
 --    WRITELINE(outfile, out_line);   
     
-    -- Grab DEC values from TXT
-    READLINE(dec_file, dec_line);
-    READ(dec_line, vt_dec, good);   
-    
-     -- TCL output
-     WRITE(OUTPUT,string'("DEC_Expected: "));            
-     WRITE(OUTPUT, vec2str(vt_dec));  
-     write(std.textio.OUTPUT, "" & LF); -- newline
+
      
 --    WRITE(out_line, "Expected DOUT: ");            
 --    WRITELINE(outfile, out_line);     
@@ -423,27 +419,37 @@ begin
        wait for clk_period;
        tRst <= '0';
        
-       -- check tb against tHAL
+       
+       -- Grab DEC values from TXT
+       READLINE(dec_file, dec_line);
+       READ(dec_line, vt_dec, good);  
+       sig_dec <= vt_dec; 
+       
+        -- TCL output
+        WRITE(OUTPUT,string'("DEC_Expected: "));            
+        WRITE(OUTPUT, vec2str(vt_dec));  
+        write(std.textio.OUTPUT, "" & LF); -- newline
+       
+       -- wait for signal to become stable
        wait for 700 us;
-              
+       -- check if the halt has been thrown
        if(tHal='1') then
         -- write results to local console
         write(OUTPUT, "---Test Complete---");
         write(std.textio.OUTPUT, "" & LF); -- newline     
         write(OUTPUT, "DOUT: "); 
         write(OUTPUT, vec2str(tOutA) & vec2str(tOutB));
+        write(std.textio.OUTPUT, "" & LF); -- newline  
+        
+        if(sig_dec = tOutA&tOutB) then
+            write(output, "SUCCESS: vector match");
+        else
+            write(output, "FAILURE: vector mismatch");
+        end if;
+        
        end if;
        
-       -- write key to file
-       
-    
-   
-       -- write din to file
-       -- write dout to file
-       -- check if dout from tb matches dout from waveform (concatenate it)
-       
-       
-       
+     
        end loop;
        wait;
     end process;
