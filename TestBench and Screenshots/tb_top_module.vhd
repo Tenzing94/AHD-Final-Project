@@ -6,8 +6,8 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.numeric_std.all;
 use STD.TEXTIO.ALL;
-USE	WORK.PKG.ALL;
 USE IEEE.STD_LOGIC_TEXTIO.ALL;
+USE	WORK.PKG.ALL;
 
 
 
@@ -34,6 +34,22 @@ component top_module is
        reg_out    : out Register_Type
       );
 end component;
+
+   -- convert std_logic_vector to string for writing to the console
+   FUNCTION vec2str(vec : std_logic_vector) RETURN string IS
+            VARIABLE stmp : string(vec'LEFT+1 DOWNTO 1);
+            BEGIN
+            FOR i IN vec'REVERSE_RANGE LOOP
+            IF vec(i) = '1' THEN
+            stmp(i+1) := '1';
+            ELSIF vec(i) = '0' THEN
+            stmp(i+1) := '0';
+            ELSE
+            stmp(i+1) := 'X';
+            END IF;
+            END LOOP;
+            RETURN stmp;
+    END vec2str;
 
     -- // Signals // --
     signal tRst : std_logic := '0';
@@ -82,6 +98,9 @@ begin
             debug => tDebug,
             pc_output => tPC,
             reg_out => tRegOut);
+   
+
+   
    
 --    Clock process (how the clock should behave)
     clk_process : process
@@ -379,9 +398,13 @@ begin
        tRst <= '0';
        
        -- check tb against tHAL
-       wait for enc_mode_start;
-       
-       assert (tHal='1') report "Decryption Finished" severity error;
+       wait for 700 us;
+              
+       if(tHal='1') then
+        -- write results to local console
+        write(OUTPUT, "Test Complete");
+        write(OUTPUT, vec2str(tOutA) & vec2str(tOutB));
+       end if;
        
        -- write key to file
        -- write din to file
