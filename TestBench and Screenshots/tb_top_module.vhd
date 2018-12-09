@@ -5,8 +5,9 @@
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.numeric_std.all;
-use STD.TEXTIO.ALL;
+USE STD.TEXTIO.ALL;
 USE IEEE.STD_LOGIC_TEXTIO.ALL;
+
 USE	WORK.PKG.ALL;
 
 
@@ -68,9 +69,7 @@ end component;
     -- dout signals
     signal tEncDoutA : std_logic_vector(31 downto 0);
     signal tEncDoutB : std_logic_vector(31 downto 0);
-    
-    signal tDINTEST : std_logic_vector(31 downto 0);
-    
+        
     
     -- clock-specific signals
     signal tClk : std_logic := '0'; -- init. the clock (required!)
@@ -119,11 +118,14 @@ begin
     FILE din_file : TEXT OPEN READ_MODE IS "enc_input.txt";
     
     FILE dec_file : TEXT OPEN READ_MODE IS "dec_input.txt"; -- decryption file to check against
-    FILE write_file : TEXT OPEN WRITE_MODE IS "output_write.txt"; -- final output, WRITE only
+    FILE out_file : TEXT OPEN WRITE_MODE IS "output_write.txt";
+
     
     VARIABLE key_line : LINE;
     VARIABLE din_line : LINE;
     VARIABLE dec_line : LINE;
+    VARIABLE out_line : LINE;        
+
     variable good: boolean; --status of the read operation
 
     VARIABLE vt_key : std_logic_vector(127 downto 0);
@@ -132,19 +134,37 @@ begin
 
     begin   
     WHILE NOT ENDFILE(din_file) LOOP
+
+
     
     -- Grab Key Values from TXT
     READLINE(key_file, key_line);
     read(key_line, vt_key, good);
     
+--    -- write key value of this run
+--    WRITE(out_line, "SKEY: ");            
+--    WRITELINE(outfile, out_line);     
+--    WRITE(out_line, vec2str(vt_key));            
+--    WRITELINE(outfile, out_line);        
+    
     -- Grab DIN Values from TXT
     READLINE(din_file, din_line);
     READ(din_line, vt_din, good);
     
+--    WRITE(out_line, "DIN: ");            
+--    WRITELINE(outfile, out_line);     
+--    WRITE(out_line, vec2str(vt_din));            
+--    WRITELINE(outfile, out_line);   
+    
     -- Grab DEC values from TXT
     READLINE(dec_file, dec_line);
-    READ(dec_line, vt_dec, good);
-    
+    READ(dec_line, vt_dec, good);   
+     
+--    WRITE(out_line, "Expected DOUT: ");            
+--    WRITELINE(outfile, out_line);     
+--    WRITE(out_line, vec2str(vt_dec));            
+--    WRITELINE(outfile, out_line);   
+        
        -- SWITCH: Input Mode
        tIP <= '0'; -- set to input
        tMode <= "00"; -- set to key expansion mode
@@ -407,6 +427,9 @@ begin
        end if;
        
        -- write key to file
+       
+    
+   
        -- write din to file
        -- write dout to file
        -- check if dout from tb matches dout from waveform (concatenate it)
