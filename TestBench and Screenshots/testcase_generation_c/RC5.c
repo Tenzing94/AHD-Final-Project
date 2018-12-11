@@ -10,7 +10,24 @@ typedef unsigned int WORD; /* Should be 32-bit = 4 bytes        */
 #define b        16             /* number of bytes in key            */
 #define c         4             /* number  words in key = ceil(8*b/w)*/
 #define t        26             /* size of table S = 2*(r+1) words   */
-WORD S[t];                      /* expanded key table                */
+
+
+// For key 00000000000000000000000000000000
+    WORD S[t] = {0X9BBBD8C8, 0X1A37F7FB, 0X46F8E8C5,
+      0X460C6085, 0X70F83B8A, 0X284B8303, 0X513E1454, 0XF621ED22,
+      0X3125065D, 0X11A83A5D, 0XD427686B, 0X713AD82D, 0X4B792F99,
+      0X2799A4DD, 0XA7901C49, 0XDEDE871A, 0X36C03196, 0XA7EFC249,
+      0X61A78BB8, 0X3B0A1D2B, 0X4DBFCA76, 0XAE162167, 0X30D76B0A,
+      0X43192304, 0XF6CC1431, 0X65046380};                      
+
+//// For key 00000000000000000000000000000001
+//    WORD S[t] = {0X36221aed, 0Xd2c60b81, 0X68a65609,
+//      0X7fe643de, 0X96841077, 0X4ad0a670, 0X1a08eedb, 0X65fc4bbe,
+//      0X1e60e594, 0X476fd29c, 0Xc5709c96, 0Xd8c195eb, 0X6bcf7623,
+//      0X9094584f, 0X77fb82c8, 0Xe82dfc07, 0Xf47bb0ea, 0X95b079f6,
+//      0X53c67e66, 0X47753374, 0X1386c75b, 0X8b5266ce, 0X1a349fa0,
+//      0X8b0d06e9, 0Xe518b107, 0Xa2af9b17};  
+
 WORD P = 0xb7e15163, Q = 0x9e3779b9;  /* magic constants             */
 /* Rotation operators. x must be unsigned, to get logical right shift*/
 #define ROTL(x,y) (((x)<<(y&(w-1))) | ((x)>>(w-(y&(w-1)))))
@@ -42,7 +59,7 @@ void RC5_SETUP(unsigned char *K) /* secret input key K[0...b-1]      */
    for (A=B=i=j=k=0; k<3*t; k++,i=(i+1)%t,j=(j+1)%c)   
      { A = S[i] = ROTL(S[i]+(A+B),3);  
        B = L[j] = ROTL(L[j]+(A+B),(A+B)); 
-     } 
+     }  
 } 
 
 void RC5(char* key2, char* v1, char* v2, WORD *ct0_ret)
@@ -81,13 +98,13 @@ void RC5(char* key2, char* v1, char* v2, WORD *ct0_ret)
 
 
       /* Setup, encrypt, and decrypt */
-      RC5_SETUP(key);  
+//      RC5_SETUP(key);  
       RC5_ENCRYPT(pt1,ct);  
       RC5_DECRYPT(ct,pt2);
       /* Print out results, checking for decryption failure */
 
 
-	  for (j = 0; j<str_len/2; j++) printf("%.2X ", key[j]);
+//	  for (j = 0; j<str_len/2; j++) printf("%.2X ", key[j]);
       printf("\n   plaintext %.8lX %.8lX  --->  ciphertext %.8lX %.8lX  \n",
              pt1[0], pt1[1], ct[0], ct[1]);
       ct0_ret[0] = ct[0];

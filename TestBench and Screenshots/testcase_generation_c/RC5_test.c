@@ -41,10 +41,11 @@ int main(){
 	output_enc_hex = fopen("output.txt", "w");
 	
 	char *key1 = "00000000000000000000000000";
+	char *key_in = "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
    	strcpy(val1, "00000000");
     strcpy(val2, "00000000");
 	
-	for(i=0;i<17;i++)
+	for(i=0;i<160;i++)
 	{
 		RC5(key1, val1, val2, ct_ret);
 	
@@ -67,6 +68,9 @@ int main(){
 		fprintf(fp_input_enc,"\n"); 
 		
 		
+		// Print skey input in file
+		fprintf(fp_input_key,"%s\n",key_in); 
+		
 		// Print for encrypt output
 		
 		msb_enc = ct_ret[0];
@@ -87,13 +91,26 @@ int main(){
 		//Print in output enc in hex
 		fprintf(output_enc_hex,"%.8lX%.8lX\n",ct_ret[0],ct_ret[1]);
 		
-		if(i < 8)
+		if(i < 72)
 		{
-			val1[i] = 'f';
+			val1[i%8] += 1;
 		}
-		else if(i < 16)
+		else if(i < 144)
+		{
+			val2[i%8] += 1;
+		}
+		else if(i<150)
+		{
+			val1[i%8] = 'f';
+		}
+		else if(i < 158)
 		{
 			val2[i%8] = 'f';
+		}
+		else
+		{
+			strcpy(val1, "ffffffff");
+    		strcpy(val2, "ffffffff");
 		}
 
 	}
