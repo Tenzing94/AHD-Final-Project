@@ -79,8 +79,10 @@ end component;
     constant enc_mode_end : time := 70000 ns; -- end time for enc_mode
     constant rst_mode_bounce : time := 340 ns;
     
+    signal sig_enc : std_logic_vector(63 downto 0);
     signal sig_dec : std_logic_vector(63 downto 0);
-
+    
+    signal counter : integer:= 0;
     
 begin
      
@@ -117,7 +119,7 @@ begin
     FILE key_file : TEXT OPEN READ_MODE IS "key_input.txt";
     FILE din_file : TEXT OPEN READ_MODE IS "enc_input.txt";
     -- expected decoded (final result) file
-    FILE dec_file : TEXT OPEN READ_MODE IS "dec_input.txt";
+    FILE dec_file : TEXT OPEN READ_MODE IS "enc_output.txt";
     -- output file
     FILE out_file : TEXT OPEN WRITE_MODE IS "write_out.txt";
     VARIABLE key_line : LINE;
@@ -132,10 +134,13 @@ begin
 
     begin   
     WHILE NOT ENDFILE(din_file) LOOP
-
+    
     -- TCL output
+    counter <= counter + 1;
     write(std.textio.OUTPUT, "" & LF); -- newline
-    WRITE(OUTPUT,string'("--RUN --")); 
+    WRITE(OUTPUT,string'("--RUN --  "));
+    WRITE(OUTPUT, integer'image(counter)); 
+    WRITE(OUTPUT,string'("   --------"));
     write(std.textio.OUTPUT, "" & LF); -- newline
     
     -- Grab Key Values from TXT
@@ -166,6 +171,9 @@ begin
 --    WRITELINE(outfile, out_line);     
 --    WRITE(out_line, vec2str(vt_dec));            
 --    WRITELINE(outfile, out_line);   
+        
+        -- Get Decrypt or input value from text
+        sig_dec <= vt_din;
         
        -- SWITCH: Input Mode
        tIP <= '0'; -- set to input
@@ -420,10 +428,10 @@ begin
        tRst <= '0';
        
        
-       -- Grab DEC values from TXT
+       -- Grab ENc values from TXT
        READLINE(dec_file, dec_line);
        READ(dec_line, vt_dec, good);  
-       sig_dec <= vt_dec; 
+       sig_enc <= vt_dec; 
        
         -- TCL output
         WRITE(OUTPUT,string'("DEC_Expected: "));            
@@ -432,20 +440,51 @@ begin
        
        -- wait for signal to become stable
        wait for 700 us;
+       
        -- check if the halt has been thrown
        if(tHal='1') then
-        -- write results to local console
+        -- write results to local console Encrypt
         write(OUTPUT, "---Test Complete---");
         write(std.textio.OUTPUT, "" & LF); -- newline     
-        write(OUTPUT, "DOUT: "); 
-        write(OUTPUT, vec2str(tOutA) & vec2str(tOutB));
+        write(OUTPUT, "DOUT: ( Encrypter ) "); 
+        write(OUTPUT, vec2str(tEncDoutA) & vec2str(tEncDoutB));
         write(std.textio.OUTPUT, "" & LF); -- newline  
         
-        if(sig_dec = tOutA&tOutB) then
-            write(output, "SUCCESS: vector match");
+        
+        if(sig_enc = tEncDoutA&tEncDoutB) then
+            write(output, "SUCCESS: Encrypt vector match");
         else
-            write(output, "FAILURE: vector mismatch");
+            write(output, "FAILURE: Encrypt vector mismatch");
         end if;
+        
+        write(std.textio.OUTPUT, "" & LF); -- newline
+        assert(sig_enc = tEncDoutA&tEncDoutB)
+        report " Encrypt Failed!"
+        severity error;
+        
+        -- write results to local console Decrypt
+        write(std.textio.OUTPUT, "" & LF); -- newline
+        write(OUTPUT, "---Test Complete---");
+        write(std.textio.OUTPUT, "" & LF); -- newline     
+        write(OUTPUT, "DOUT: ( Decrypt ) "); 
+        write(OUTPUT, vec2str(tOutA) & vec2str(tOutB));
+        write(std.textio.OUTPUT, "" & LF); -- newline
+        
+        if(sig_dec = tOutA&tOutB) then
+            write(output, "SUCCESS: Decrypt vector match");
+        else
+            write(output, "FAILURE: Decrypt vector mismatch");
+        end if;
+        
+        write(std.textio.OUTPUT, "" & LF); -- newline
+        assert(sig_dec = tOutA&tOutB)
+        report " Decrypt Failed!"
+        severity error;
+        
+        write(std.textio.OUTPUT, "" & LF); -- newline
+        write(OUTPUT, "--------------------------------------------------------------------------------------------------------------------------------------------------------------------");   
+        write(std.textio.OUTPUT, "" & LF); -- newline
+       
         
        end if;
        
