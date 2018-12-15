@@ -434,7 +434,7 @@ begin
        sig_enc <= vt_dec; 
        
         -- TCL output
-        WRITE(OUTPUT,string'("DEC_Expected: "));            
+        WRITE(OUTPUT,string'("ENC_Expected: "));            
         WRITE(OUTPUT, vec2str(vt_dec));  
         write(std.textio.OUTPUT, "" & LF); -- newline
        
