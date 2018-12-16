@@ -160,7 +160,7 @@ begin
     vt_key := x"00000000000000000000000000000000";
     
 
-    vt_din := x"0000000000000000";
+     vt_din := x"0000000000000000";
 
      vt_dec := "1110111011011011101001010010000101101101100011110100101100010101";
      
@@ -403,7 +403,7 @@ begin
        end if;
        
        
-       -- Round 2
+       -- Round 2 Key Gen and Decryption
        
        -- TCL output
        counter <= counter + 1;
@@ -416,8 +416,8 @@ begin
        -- Set input key value
         vt_key := x"00000000000000000000000000000000";
    
-        vt_din := "0001000000000000000000000000000000000000000000000000000000000000";   
-        vt_dec := "0010011000000011010111010100111000111110000000010010110001010101";
+        vt_din := x"0000000000000000";   
+        vt_dec := x"EEDBA5216D8F4B15";
         
          -- TCL output
          write(std.textio.OUTPUT, "" & LF); -- newline
@@ -917,9 +917,9 @@ begin
        
               
    
-        vt_din := "0001000100000000000000000000000000000000000000000000000000000000";
+        vt_din := x"1000000000000000";
    
-        vt_dec := "1110001010100110111010000000101011000000000101010011101101101001";
+        vt_dec := x"26035D4E3E012C55";
          
           write(std.textio.OUTPUT, "" & LF); -- newline
          WRITE(OUTPUT,string'("-------------ENCRYPT 2------------"));
@@ -1156,7 +1156,7 @@ begin
           
           end if;
              
-       -- Round 2
+       -- Round 4 KEy gen Decrypt 1 + Decrypt 2
          
          -- TCL output
          counter <= counter + 1;
@@ -1169,8 +1169,8 @@ begin
          -- Set input key value
           vt_key := x"00000000000000000000000000000000";
      
-          vt_din := "0001000100010000000000000000000000000000000000000000000000000000";   
-          vt_dec := "0011011010000111001101010000001111110110000000101000000010101101";
+          vt_din := x"0000000000000000";   
+          vt_dec := x"EEDBA5216D8F4B15";
       
           WRITE(OUTPUT,string'("-------------DECRYPT 1------------"));
           write(std.textio.OUTPUT, "" & LF); -- newline
@@ -1415,8 +1415,8 @@ begin
         -- Set input key value
          vt_key := x"00000000000000000000000000000000";
     
-         vt_din := "0001000100010001000000000000000000000000000000000000000000000000";   
-         vt_dec := "1010100011001010010100110000000111100001010001111101111100010101";
+         vt_din := x"1000000000000000";   
+         vt_dec := x"26035D4E3E012C55";
         
          write(std.textio.OUTPUT, "" & LF); -- newline
          WRITE(OUTPUT,string'("-------------DECRYPT 2------------"));
@@ -2071,7 +2071,7 @@ begin
                wait for clk_period;
                tRst <= '0';
                 
-                wait for 100 us;
+                wait for 100 ns;
                -- Toggle Reset 
                tRst <= '0';
                wait for clk_period/2;
